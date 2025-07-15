@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Il Tuo Profilo</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+    <style>
+        .profile-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .profile-sidebar {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .profile-content {
+            flex: 3;
+            min-width: 300px;
+        }
+        
+        .profile-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+        
+        .profile-name {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .profile-role {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #343a40;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .profile-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .profile-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .profile-menu a {
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #495057;
+            transition: background-color 0.2s;
+        }
+        
+        .profile-menu a:hover, .profile-menu a.active {
+            background-color: #e9ecef;
+            color: #007bff;
+        }
+        
+        .profile-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .profile-section h3 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .info-label {
+            flex: 1;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .info-value {
+            flex: 2;
+            color: #212529;
+        }
+        
+        .recent-products {
+            margin-top: 20px;
+        }
+        
+        .product-item {
+            display: flex;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        
+        .product-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 5px;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-details {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .product-price {
+            color: #28a745;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-all {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        .view-all:hover {
+            text-decoration: underline;
+        }
+        
+        .btn-edit-profile {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-edit-profile:hover {
+            background-color: #0069d9;
+        }
+        
+        .settings-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .setting-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            transition: transform 0.2s;
+        }
+        
+        .setting-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .setting-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
+        
+        .setting-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-container {
+                flex-direction: column;
+            }
+            
+            .profile-sidebar, .profile-content {
+                width: 100%;
+            }
+        }
+        
+        /* New tab system */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Action buttons */
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-action {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #f8f9fa;
+            color: #495057;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s;
+        }
+        
+        .btn-action:hover {
+            background-color: #e9ecef;
+            color: #007bff;
+        }
+        
+        /* Empty section styling */
+        .empty-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .empty-section i {
+            color: #adb5bd;
+            margin-bottom: 15px;
+        }
+        
+        .empty-section p {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        
+        /* Form styling */
+        .settings-form, .security-form, .payment-form {
+            max-width: 600px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-group small {
+            display: block;
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        /* Switch toggle */
+        .notification-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .notification-option:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-option h4 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+        }
+        
+        .notification-option p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px #007bff;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .slider.round {
+            border-radius: 34px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    
+    <main class="container">
+        <h1>Il Tuo Profilo</h1>
+        
+        <div class="profile-container">
+            <div class="profile-sidebar">
+                <div class="profile-card">
+                    <div class="profile-avatar" th:text="${username != null && username.length() > 0 ? username.substring(0,1).toUpperCase() : 'U'}">U</div>
+                    <h2 class="profile-name" th:text="${username != null ? username : 'Utente'}">Username</h2>
+                    <p class="profile-role" th:text="${user != null ? user.role : 'Utente'}">Ruolo</p>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" th:text="${user != null && user.authoredProducts != null ? user.authoredProducts.size() : 0}">0</div>
+                            <div class="stat-label">Prodotti</div>
+                        </div>
+                    </div>
+                    
+                    <a href="#" class="btn-edit-profile" onclick="showTab('settings')">Modifica Profilo</a>
+                </div>
+                
+                <div class="profile-card">
+                    <ul class="profile-menu">
+                        <li><a href="#dashboard" class="active" onclick="showTab('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a th:href="@{/users/products}"><i class="fas fa-box-open"></i> I Miei Prodotti</a></li>
+                        <li><a href="#orders" onclick="showTab('orders')"><i class="fas fa-shopping-cart"></i> Acquisti</a></li>
+                        <li><a href="#payment" onclick="showTab('payment')"><i class="fas fa-credit-card"></i> Metodi di Pagamento</a></li>
+                        <li><a href="#settings" onclick="showTab('settings')"><i class="fas fa-cog"></i> Impostazioni</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="profile-content">
+                <div id="dashboard" class="tab-content active">
+                    <div class="profile-section">
+                        <h3><i class="fas fa-info-circle"></i> Informazioni Personali</h3>
+                        
+                        <div class="info-row">
+                            <div class="info-label">Username:</div>
+                            <div class="info-value" th:text="${username != null ? username : 'N/A'}">Username</div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-label">Email:</div>
+                            <div class="info-value" th:text="${user != null ? user.email : 'N/A'}">Email</div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-label">Ruolo:</div>
+                            <div class="info-value" th:text="${user != null ? user.role : 'Utente'}">Ruolo</div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-label">Prodotti:</div>
+                            <div class="info-value" th:text="${user != null && user.authoredProducts != null ? user.authoredProducts.size() : 0}">0</div>
+                        </div>
+                        
+                        <div class="action-btns">
+                            <a href="#" class="btn-action" onclick="showTab('settings')">
+                                <i class="fas fa-user-edit"></i> Modifica Profilo
+                            </a>
+                            <a th:href="@{'/users/seller/' + ${username}}" class="btn-action" target="_blank">
+                                <i class="fas fa-eye"></i> Visualizza Profilo Pubblico
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3><i class="fas fa-box"></i> Prodotti Recenti</h3>
+                        
+                        <div th:if="${user == null || user.authoredProducts == null || user.authoredProducts.isEmpty()}" class="empty-products">
+                            <p>Non hai ancora caricato nessun prodotto.</p>
+                            <a th:href="@{/product/create}" class="btn-edit-profile">
+                                <i class="fas fa-plus-circle"></i> Aggiungi Prodotto
+                            </a>
+                        </div>
+                        
+                        <div th:unless="${user == null || user.authoredProducts == null || user.authoredProducts.isEmpty()}" class="recent-products">
+                            <div th:each="product, iterStat : ${user.authoredProducts}" 
+                                 th:if="${iterStat.index < 3}"
+                                 class="product-item">
+                                <div class="product-image">
+                                    <img th:if="${not #lists.isEmpty(product.images)}" 
+                                         th:src="@{'/product/image/' + ${product.images[0].id}}" 
+                                         th:alt="${product.name}" />
+                                    <img th:if="${#lists.isEmpty(product.images)}" 
+                                         th:src="@{/immagini/placeholder.jpg}" 
+                                         alt="Nessuna immagine" />
+                                </div>
+                                
+                                <div class="product-details">
+                                    <div class="product-name" th:text="${product.name}">Nome Prodotto</div>
+                                    <div class="product-price">€<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span></div>
+                                </div>
+                                
+                                <div class="product-actions">
+                                    <a th:href="@{'/product/details/' + ${product.id}}" class="btn btn-primary btn-sm" title="Visualizza">👁️</a>
+                                    <a th:href="@{'/product/edit/' + ${product.id}}" class="btn btn-outline btn-sm" title="Modifica">✏️</a>
+                                </div>
+                            </div>
+                            
+                            <a th:href="@{/users/products}" class="view-all">
+                                <i class="fas fa-list"></i> Visualizza tutti i prodotti
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3><i class="fas fa-bolt"></i> Impostazioni Rapide</h3>
+                        
+                        <div class="settings-section">
+                            <div class="setting-card">
+                                <div class="setting-title"><i class="fas fa-box-open"></i> Aggiungi Nuovo Prodotto</div>
+                                <div class="setting-description">Carica un nuovo prodotto da vendere.</div>
+                                <a th:href="@{/product/create}" class="btn-edit-profile">Aggiungi</a>
+                            </div>
+                            
+                            <div class="setting-card">
+                                <div class="setting-title"><i class="fas fa-lock"></i> Cambia Password</div>
+                                <div class="setting-description">Aggiorna la tua password per maggiore sicurezza.</div>
+                                <a href="#" class="btn-edit-profile" onclick="showTab('settings')">Cambia</a>
+                            </div>
+                            
+                            <div class="setting-card">
+                                <div class="setting-title"><i class="fas fa-envelope"></i> Gestisci Email</div>
+                                <div class="setting-description">Aggiorna il tuo indirizzo email.</div>
+                                <a href="#" class="btn-edit-profile" onclick="showTab('settings')">Gestisci</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sezione Ordini -->
+                <div id="orders" class="tab-content">
+                    <div class="profile-section">
+                        <h3><i class="fas fa-shopping-bag"></i> I Tuoi Acquisti</h3>
+                        <div class="empty-section">
+                            <i class="fas fa-shopping-cart fa-3x"></i>
+                            <p>Non hai ancora effettuato nessun acquisto.</p>
+                            <a th:href="@{/products}" class="btn-edit-profile">Esplora Prodotti</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sezione Pagamenti -->
+                <div id="payment" class="tab-content">
+                    <div class="profile-section">
+                        <h3><i class="fas fa-credit-card"></i> Metodi di Pagamento</h3>
+                        
+                        <div class="empty-section">
+                            <i class="fas fa-credit-card fa-3x"></i>
+                            <p>Non hai ancora aggiunto nessun metodo di pagamento.</p>
+                            <a href="#" class="btn-edit-profile">Aggiungi Metodo di Pagamento</a>
+                        </div>
+                        
+                        <div class="payment-form-container" style="display: none;">
+                            <h4>Aggiungi Carta di Credito</h4>
+                            <form class="payment-form">
+                                <div class="form-group">
+                                    <label>Titolare Carta</label>
+                                    <input type="text" placeholder="Nome Cognome" required />
+                                </div>
+                                <div class="form-group">
+                                    <label>Numero Carta</label>
+                                    <input type="text" placeholder="0000 0000 0000 0000" required />
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Scadenza</label>
+                                        <input type="text" placeholder="MM/AA" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>CVV</label>
+                                        <input type="text" placeholder="123" required />
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-edit-profile">Salva Carta</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sezione Impostazioni -->
+                <div id="settings" class="tab-content">
+                    <div class="profile-section">
+                        <h3><i class="fas fa-user-cog"></i> Impostazioni Profilo</h3>
+                        
+                        <form class="settings-form">
+                            <div class="form-group">
+                                <label>Nome Utente</label>
+                                <input type="text" th:value="${username != null ? username : ''}" readonly />
+                                <small>Il nome utente non può essere modificato.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Indirizzo Email</label>
+                                <input type="email" th:value="${user != null ? user.email : ''}" />
+                            </div>
+                            <div class="form-group">
+                                <label>Bio</label>
+                                <textarea placeholder="Scrivi qualcosa su di te..."></textarea>
+                            </div>
+                            <button type="button" class="btn-edit-profile">Salva Modifiche</button>
+                        </form>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3><i class="fas fa-lock"></i> Sicurezza</h3>
+                        
+                        <form class="security-form">
+                            <div class="form-group">
+                                <label>Password Attuale</label>
+                                <input type="password" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Nuova Password</label>
+                                <input type="password" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Conferma Nuova Password</label>
+                                <input type="password" required />
+                            </div>
+                            <button type="button" class="btn-edit-profile">Cambia Password</button>
+                        </form>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3><i class="fas fa-bell"></i> Preferenze Notifiche</h3>
+                        
+                        <div class="notification-settings">
+                            <div class="notification-option">
+                                <div>
+                                    <h4>Email di Marketing</h4>
+                                    <p>Ricevi informazioni su offerte e promozioni.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-option">
+                                <div>
+                                    <h4>Notifiche su Nuovi Prodotti</h4>
+                                    <p>Ricevi notifiche quando vengono aggiunti nuovi prodotti.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-option">
+                                <div>
+                                    <h4>Aggiornamenti Account</h4>
+                                    <p>Ricevi notifiche sugli aggiornamenti del tuo account.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Include footer fragment -->    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script>
+        // Funzione per mostrare un tab e nascondere gli altri
+        function showTab(tabId) {
+            // Nascondi tutti i tab
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostra il tab richiesto
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+            
+            // Aggiorna la classe active nel menu
+            document.querySelectorAll('.profile-menu a').forEach(menuItem => {
+                menuItem.classList.remove('active');
+            });
+            
+            // Aggiungi la classe active all'elemento di menu corrispondente
+            const activeMenuItem = document.querySelector('.profile-menu a[href="#' + tabId + '"]');
+            if (activeMenuItem) {
+                activeMenuItem.classList.add('active');
+            }
+        }
+        
+        // Imposta il tab dashboard come attivo all'avvio
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verifica che l'elemento dashboard esista
+            if (document.getElementById('dashboard')) {
+                document.getElementById('dashboard').classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
+
+

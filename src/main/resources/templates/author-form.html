@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${author?.id != null ? 'Modifica Autore' : 'Nuovo Autore'} + ' - Libreria Sitarello'">Nuovo Autore - Libreria Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/author-form.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <main class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a th:href="@{/}">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+            <span class="separator">/</span>
+            <!-- Mostra link diverso se si arriva dalla creazione libro -->
+            <a id="backToBookLink" th:href="@{/product/create}" style="display: none;">
+                <i class="fas fa-book-medical"></i>
+                Creazione Libro
+            </a>
+            <a th:href="@{/authors}" id="authorsLink">
+                <i class="fas fa-users"></i>
+                Autori
+            </a>
+            <span class="separator">/</span>
+            <span class="current" th:text="${author?.id != null ? 'Modifica' : 'Nuovo Autore'}">Nuovo Autore</span>
+        </nav>
+
+        <!-- Author Form -->
+        <div class="author-form-container">
+            <div class="form-header">
+                <h1 th:if="${author?.id == null}">
+                    <i class="fas fa-user-plus"></i>
+                    Aggiungi Nuovo Autore
+                </h1>
+                <h1 th:if="${author?.id != null}">
+                    <i class="fas fa-user-edit"></i>
+                    Modifica Autore
+                </h1>
+                <p th:if="${author?.id == null}">Aggiungi un nuovo autore alla libreria</p>
+                <p th:if="${author?.id != null}">Modifica le informazioni dell'autore</p>
+            </div>
+
+            <!-- Author Form -->
+            <form th:action="${author?.id != null ? '/authors/edit/' + author.id : '/authors/create'}" 
+                  method="post" 
+                  th:object="${authorFormDTO}" 
+                  class="author-form"
+                  enctype="multipart/form-data">
+                
+                <!-- Hidden ID field for editing -->
+                <input th:if="${author?.id != null}" type="hidden" name="id" th:value="${author.id}" />
+                
+                <!-- Current Photo Display -->
+                <div th:if="${author?.id != null && author.fotografia != null}" class="current-photo-section">
+                    <h3>
+                        <i class="fas fa-image"></i>
+                        Foto Attuale
+                    </h3>
+                    <div class="current-photo">
+                        <img th:src="@{'/authors/photo/' + ${author.id}}" 
+                             th:alt="${author.nome + ' ' + author.cognome}"
+                             class="current-photo-img">
+                    </div>
+                </div>
+
+                <!-- Photo Upload -->
+                <div class="form-group">
+                    <label for="fotografia" class="form-label">
+                        <i class="fas fa-camera"></i>
+                        <span th:text="${author?.id != null ? 'Cambia Foto' : 'Foto Autore'}">Foto Autore</span>
+                    </label>
+                    <div class="file-input-container">
+                        <input type="file" 
+                               id="fotografia" 
+                               name="fotografia"
+                               class="file-input"
+                               accept="image/*">
+                        <label for="fotografia" class="file-input-label">
+                            <i class="fas fa-upload"></i>
+                            <span class="file-input-text">Scegli file...</span>
+                        </label>
+                        <div class="file-preview" id="file-preview" style="display: none;">
+                            <img id="preview-img" alt="Anteprima foto">
+                            <button type="button" class="remove-preview" onclick="removePreview()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-help">Formati supportati: JPG, PNG, GIF. Dimensione massima: 5MB</div>
+                </div>
+
+                <!-- Name Fields -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome" class="form-label">
+                            <i class="fas fa-user"></i>
+                            Nome *
+                        </label>
+                        <input type="text" 
+                               id="nome" 
+                               th:field="*{nome}"
+                               class="form-input"
+                               placeholder="Nome dell'autore"
+                               required>
+                        <div th:if="${#fields.hasErrors('nome')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{nome}">Errore nome</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cognome" class="form-label">
+                            <i class="fas fa-user"></i>
+                            Cognome *
+                        </label>
+                        <input type="text" 
+                               id="cognome" 
+                               th:field="*{cognome}"
+                               class="form-input"
+                               placeholder="Cognome dell'autore"
+                               required>
+                        <div th:if="${#fields.hasErrors('cognome')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{cognome}">Errore cognome</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nationality -->
+                <div class="form-group">
+                    <label for="nazionalita" class="form-label">
+                        <i class="fas fa-globe"></i>
+                        Nazionalità
+                    </label>
+                    <input type="text" 
+                           id="nazionalita" 
+                           th:field="*{nazionalita}"
+                           class="form-input"
+                           placeholder="es. Italiana, Americana, Inglese...">
+                    <div th:if="${#fields.hasErrors('nazionalita')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{nazionalita}">Errore nazionalità</span>
+                    </div>
+                </div>
+
+                <!-- Birth and Death Dates -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dataNascita" class="form-label">
+                            <i class="fas fa-birthday-cake"></i>
+                            Data di Nascita
+                        </label>
+                        <input type="date" 
+                               id="dataNascita" 
+                               th:field="*{dataNascita}"
+                               class="form-input"
+                               max="2024-12-31">
+                        <div th:if="${#fields.hasErrors('dataNascita')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{dataNascita}">Errore data nascita</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dataMorte" class="form-label">
+                            <i class="fas fa-cross"></i>
+                            Data di Morte
+                        </label>
+                        <input type="date" 
+                               id="dataMorte" 
+                               th:field="*{dataMorte}"
+                               class="form-input"
+                               max="2024-12-31">
+                        <div th:if="${#fields.hasErrors('dataMorte')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{dataMorte}">Errore data morte</span>
+                        </div>
+                        <div class="form-help">Lascia vuoto se l'autore è ancora vivo</div>
+                    </div>
+                </div>
+
+                <!-- Biography -->
+                <div class="form-group">
+                    <label for="biografia" class="form-label">
+                        <i class="fas fa-book-open"></i>
+                        Biografia
+                    </label>
+                    <textarea id="biografia" 
+                              th:field="*{biografia}"
+                              class="form-textarea"
+                              placeholder="Scrivi una breve biografia dell'autore..."
+                              rows="6"
+                              maxlength="2000"></textarea>
+                    <div th:if="${#fields.hasErrors('biografia')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{biografia}">Errore biografia</span>
+                    </div>
+                    <div class="form-help">
+                        <span id="bio-char-count">0</span>/2000 caratteri
+                    </div>
+                </div>
+
+                <!-- Guidelines -->
+                <div class="form-guidelines">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        Linee guida
+                    </h3>
+                    <ul>
+                        <li>Nome e cognome sono obbligatori</li>
+                        <li>La foto deve essere in formato JPG, PNG o GIF</li>
+                        <li>La data di morte deve essere successiva alla data di nascita</li>
+                        <li>La biografia dovrebbe includere informazioni rilevanti sulla vita e opere dell'autore</li>
+                        <li>Assicurati che le informazioni siano accurate e verificate</li>
+                    </ul>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        <span th:text="${author?.id != null ? 'Salva Modifiche' : 'Crea Autore'}">Crea Autore</span>
+                    </button>
+                    
+                    <!-- Pulsante di ritorno dinamico -->
+                    <a id="backToBookBtn" th:href="@{/product/create}" class="btn btn-success" style="display: none;">
+                        <i class="fas fa-arrow-left"></i>
+                        Torna alla Creazione Libro
+                    </a>
+                    
+                    <a th:href="@{/authors}" class="btn btn-outline" id="cancelBtn">
+                        <i class="fas fa-times"></i>
+                        Annulla
+                    </a>
+                    <button th:if="${author?.id != null}" 
+                            type="button" 
+                            class="btn btn-danger"
+                            onclick="confirmDelete()">
+                        <i class="fas fa-trash"></i>
+                        Elimina Autore
+                    </button>
+                </div>
+            </form>
+
+            <!-- Delete Confirmation Modal -->
+            <div th:if="${author?.id != null}" id="delete-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Conferma Eliminazione
+                    </h3>
+                    <p>Sei sicuro di voler eliminare questo autore?</p>
+                    <p><strong>Attenzione:</strong> Questa azione eliminerà anche tutti i libri associati a questo autore!</p>
+                    
+                    <div class="modal-actions">
+                        <form th:action="@{'/authors/delete/' + ${author.id}}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i>
+                                Elimina Definitivamente
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">
+                            <i class="fas fa-times"></i>
+                            Annulla
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script th:src="@{/js/author-form.js}"></script>
+</body>
+</html>

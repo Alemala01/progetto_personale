@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Navbar Fragment</title>
+    <script defer th:src="@{/js/navbar.js}"></script>
+</head>
+<body>
+    <!-- Navbar Fragment -->
+    <header th:fragment="navbar">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <a th:href="@{/}">📚 Libreria Sitarello</a>
+            </div>
+            <div class="nav-search">
+                <form th:action="@{/products/quick-search}" method="get">
+                    <input type="text" name="q" placeholder="Cerca libri..." />
+                    <button type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="nav-links">
+                <!-- Link per utenti autenticati -->
+                <div th:if="${isAuthenticated}">
+                    <a th:href="@{/products}">
+                        <i class="fas fa-book"></i> Libri
+                    </a>
+                    <a th:href="@{/authors}">
+                        <i class="fas fa-feather-alt"></i> Autori
+                    </a>
+                    
+                    <!-- Link solo per admin -->
+                    <a th:if="${isAdmin}" th:href="@{/product/create}">
+                        <i class="fas fa-plus-circle"></i> Aggiungi Libro
+                    </a>
+                    <a th:if="${isAdmin}" th:href="@{/author/create}">
+                        <i class="fas fa-user-plus"></i> Aggiungi Autore
+                    </a>
+                    
+                    <!-- Dropdown per utente loggato -->
+                    <div class="dropdown">
+                        <span class="dropdown-toggle" th:text="${username}">Utente</span>
+                        <div class="dropdown-menu">
+                            <!-- Link admin solo per amministratori -->
+                            <a th:if="${isAdmin}" th:href="@{/admin}">
+                                <i class="fas fa-shield-alt"></i> Dashboard Admin
+                            </a>
+                            <a th:href="@{/users/profile}">
+                                <i class="fas fa-user"></i> Profilo
+                            </a>
+                            <form th:action="@{/logout}" method="post" class="nav-logout">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Link per utenti non autenticati -->
+                <div th:unless="${isAuthenticated}">
+                    <a th:href="@{/products}">
+                        <i class="fas fa-book"></i> Libri
+                    </a>
+                    <a th:href="@{/authors}">
+                        <i class="fas fa-feather-alt"></i> Autori
+                    </a>
+                    <a th:href="@{/users/login}">
+                        <i class="fas fa-sign-in-alt"></i> Accedi
+                    </a>
+                    <a th:href="@{/users/register}">
+                        <i class="fas fa-user-plus"></i> Registrati
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+</body>
+</html>

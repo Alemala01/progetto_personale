@@ -1,0 +1,52 @@
+package it.uniroma3.siw.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+import it.uniroma3.siw.service.UsersService;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Autowired
+    private UsersService usersService;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        // Pubblico: tutti possono visualizzare
+                        .requestMatchers("/", "/products", "/products/**", "/authors", "/authors/**", 
+                                        "/product/details/**", "/product/image/**", "/authors/photo/**",
+                                        "/users/register", "/users/login", "/login", "/css/**", "/js/**", 
+                                        "/immagini/**", "/images/**").permitAll()
+                        
+                        // Solo utenti autenticati: possono lasciare recensioni
+                        .requestMatchers("/review/**", "/users/profile", "/users/products").authenticated()
+                        
+                        // Solo admin: possono aggiungere libri e autori
+                        .requestMatchers("/product/create/**", "/product/edit/**", "/product/delete/**",
+                                        "/author/create/**", "/author/edit/**", "/author/delete/**",
+                                        "/admin/**").hasRole("ADMIN")
+                        
+                        .anyRequest().permitAll()
+                )
+                .formLogin(form -> form
+                        .loginPage("/users/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .permitAll()
+                )
+                .userDetailsService(usersService);
+        return http.build();
+    }
+}

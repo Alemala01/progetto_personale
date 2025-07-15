@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${product.name + ' - Valutazioni - Sitarello'}">Valutazioni del Prodotto - Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/product-ratings.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <main class="container">
+        <div class="ratings-container">
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a th:href="@{/}">Home</a>
+                <span class="breadcrumb-separator">/</span>
+                <a th:href="@{/products}">Prodotti</a>
+                <span class="breadcrumb-separator">/</span>
+                <a th:href="@{'/product/details/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a>
+                <span class="breadcrumb-separator">/</span>
+                <span>Valutazioni</span>
+            </div>
+
+            <div class="page-header">
+                <h1 th:text="${'Valutazioni per ' + product.name}">Valutazioni del Prodotto</h1>
+                <a th:href="@{'/product/details/' + ${product.id}}" class="btn-back">
+                    ← Torna al Prodotto
+                </a>
+            </div>
+            
+            <!-- Riepilogo delle valutazioni -->
+            <div class="rating-summary">
+                <div class="average-rating">
+                    <div class="rating-value" th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">4.5</div>
+                    <div class="rating-stars">
+                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                            <span th:if="${i <= averageRating}" class="star filled">★</span>
+                            <span th:if="${i > averageRating}" class="star">☆</span>
+                        </span>
+                    </div>
+                    <div class="rating-count" th:text="${ratingCount + ' valutazioni'}">10 valutazioni</div>
+                </div>
+                
+                <div class="rating-distribution">
+                    <!-- Qui puoi aggiungere una distribuzione delle valutazioni se necessario -->
+                </div>
+            </div>
+            
+            <!-- Messaggio se l'utente ha già valutato -->
+            <div th:if="${hasUserRated}" class="user-rating-info">
+                <p>Hai già valutato questo prodotto. Puoi modificare la tua valutazione utilizzando il form qui sotto.</p>
+            </div>
+            
+            <!-- Form per aggiungere/modificare valutazione (solo per utenti autenticati e non venditori del prodotto) -->
+            <div th:if="${isAuthenticated and (product.seller == null or product.seller.username != username)}" class="rating-form">
+                <h2 class="form-title" th:text="${hasUserRated ? 'Modifica la tua valutazione' : 'Aggiungi una valutazione'}">Aggiungi una valutazione</h2>
+                
+                <form th:action="@{/ratings/submit}" method="post" th:object="${ratingDTO}">
+                    <input type="hidden" name="productId" th:value="${product.id}" />
+                    
+                    <div class="form-group">
+                        <label class="form-label">Il tuo voto:</label>
+                        <div class="star-rating">
+                            <input type="radio" th:field="*{value}" id="star5" value="5" />
+                            <label for="star5" title="5 stars"></label>
+                            
+                            <input type="radio" th:field="*{value}" id="star4" value="4" />
+                            <label for="star4" title="4 stars"></label>
+                            
+                            <input type="radio" th:field="*{value}" id="star3" value="3" />
+                            <label for="star3" title="3 stars"></label>
+                            
+                            <input type="radio" th:field="*{value}" id="star2" value="2" />
+                            <label for="star2" title="2 stars"></label>
+                            
+                            <input type="radio" th:field="*{value}" id="star1" value="1" />
+                            <label for="star1" title="1 star"></label>
+                        </div>
+                        <div class="error-message" th:if="${#fields.hasErrors('value')}" th:errors="*{value}">Errore</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="comment">Il tuo commento (opzionale):</label>
+                        <textarea th:field="*{comment}" id="comment" rows="4" placeholder="Condividi la tua esperienza con questo prodotto..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">Invia valutazione</button>
+                </form>
+            </div>
+            
+            <!-- Messaggio per il venditore del prodotto -->
+            <div th:if="${isAuthenticated and product.seller != null and product.seller.username == username}" class="rating-form seller-info">
+                <div class="form-title">Il tuo prodotto</div>
+                <p style="color: #6c757d; margin-bottom: 20px;">
+                    <i class="fas fa-info-circle" style="color: #17a2b8; margin-right: 8px;"></i>
+                    Non puoi valutare i tuoi prodotti. Questa pagina ti mostra tutte le valutazioni ricevute dai tuoi clienti.
+                </p>
+            </div>
+            
+            <!-- Messaggio per utenti non autenticati -->
+            <div th:unless="${isAuthenticated}" class="rating-form">
+                <div class="form-title">Vuoi lasciare una valutazione?</div>
+                <p style="color: #6c757d; margin-bottom: 20px;">
+                    Per lasciare una valutazione e aiutare altri utenti nella scelta, 
+                    <a th:href="@{/users/login}" style="color: #007bff; font-weight: 600;">accedi al tuo account</a> 
+                    oppure <a th:href="@{/users/register}" style="color: #28a745; font-weight: 600;">registrati gratuitamente</a>.
+                </p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a th:href="@{/users/login}" class="btn-submit" style="text-decoration: none; display: inline-block;">
+                        Accedi
+                    </a>
+                    <a th:href="@{/users/register}" class="btn-submit" style="text-decoration: none; display: inline-block; background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);">
+                        Registrati
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Lista delle valutazioni -->
+            <div class="ratings-list">
+                <h2 class="ratings-title">Tutte le valutazioni</h2>
+                
+                <div th:if="${#lists.isEmpty(ratings)}" class="no-ratings">
+                    <p>Nessuna valutazione disponibile per questo prodotto.</p>
+                </div>
+                
+                <div th:each="rating : ${ratings}" class="rating-item">
+                    <div class="rating-header">
+                        <div class="rating-user">
+                            <span th:text="${rating.user.username}">username</span>
+                            <span class="rating-stars" style="margin-left: 10px;">
+                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                    <span th:if="${i <= rating.value}" class="star filled">★</span>
+                                    <span th:if="${i > rating.value}" class="star">☆</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="rating-date" th:text="${#temporals.format(rating.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2025</div>
+                    </div>
+                    
+                    <div class="rating-content" th:if="${rating.comment != null and not #strings.isEmpty(rating.comment)}" th:text="${rating.comment}">
+                        Commento della valutazione...
+                    </div>
+                    
+                    <!-- Pulsante per eliminare la propria valutazione -->
+                    <div th:if="${isAuthenticated and username == rating.user.username}" style="text-align: right; margin-top: 10px;">
+                        <button th:attr="onclick=|deleteRating(${rating.id})|" class="btn-delete">Elimina</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script th:inline="javascript">
+        // Funzione per eliminare un rating
+        function deleteRating(ratingId) {
+            if (confirm('Sei sicuro di voler eliminare questa valutazione?')) {
+                fetch(`/ratings/${ratingId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Ricarica la pagina dopo l'eliminazione
+                        window.location.reload();
+                    } else {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
+                })
+                .catch(error => {
+                    alert('Errore durante l\'eliminazione della valutazione: ' + error.message);
+                });
+            }
+        }
+        
+        // Se l'utente ha già valutato, preseleziona la sua valutazione
+        document.addEventListener('DOMContentLoaded', function() {
+            const userRatingValue = /*[[${userRating != null ? userRating.value : null}]]*/ null;
+            if (userRatingValue) {
+                const radioInput = document.querySelector(`input[name="value"][value="${userRatingValue}"]`);
+                if (radioInput) {
+                    radioInput.checked = true;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

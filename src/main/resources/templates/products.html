@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elenco Prodotti - Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/products.css?v=10}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Scopri tutti i prodotti disponibili su Sitarello">
+</head>
+<body class="products-page">
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    
+    <main class="products-container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1 class="page-title">
+                    <i class="fas fa-box-open"></i>
+                    Tutti i Prodotti
+                </h1>
+                <p class="page-subtitle">Scopri la nostra selezione completa di prodotti di qualità</p>
+            </div>
+        </div>
+        
+        <!-- Products Grid -->
+        <div th:if="${products != null && !products.isEmpty()}" class="products-grid">
+            <div th:each="product : ${products}" class="product-card">
+                <!-- Product Image -->
+                <div class="product-image">
+                    <div th:if="${product.images != null && !product.images.isEmpty()}" 
+                         th:class="${'product-image-grid ' + (product.images.size() == 1 ? ' single' : (product.images.size() == 3 ? ' three' : (product.images.size() >= 4 ? ' four' : '')))}">
+                        <img th:each="image, iterStat : ${product.images}" 
+                             th:if="${iterStat.index < 4}"
+                             th:src="@{'/product/image/' + ${image.id}}" 
+                             th:alt="${product.name}" />
+                    </div>
+                    <div th:unless="${product.images != null && !product.images.isEmpty()}" class="product-image-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                </div>
+                
+                <!-- Product Content -->
+                <div class="product-content">
+                    <div class="product-header">
+                        <h2 class="product-name" th:text="${product.name}">Nome Prodotto</h2>
+                        <div class="product-price">€<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span></div>
+                    </div>
+                    
+                    <div th:if="${product.category != null}" class="product-category" th:text="${product.category.name}">Categoria</div>
+                    <div th:if="${product.category == null}" class="product-category">Categoria non specificata</div>
+                    
+                    <p class="product-description" th:text="${product.description}">Descrizione del prodotto</p>
+                    
+                    <div class="product-seller">
+                        <i class="fas fa-user"></i>
+                        <span>Venditore:</span>
+                        <a th:href="@{'/users/seller/' + ${product.seller.username}}" th:text="${product.seller.username}">
+                            Nome Venditore
+                        </a>
+                    </div>
+                    
+                    <div class="product-actions">
+                        <a th:href="@{'/product/details/' + ${product.id}}" class="btn btn-primary">
+                            <i class="fas fa-eye"></i> Visualizza
+                        </a>
+                        
+                        <!-- Pulsante di modifica solo se l'utente è autenticato e proprietario del prodotto -->
+                        <a th:if="${isAuthenticated and product.seller.username == username}" 
+                           th:href="@{'/product/edit/' + ${product.id}}" 
+                           class="btn btn-outline">
+                            <i class="fas fa-edit"></i> Modifica
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Empty State -->
+        <div th:if="${products == null || products.isEmpty()}" class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <h3>Nessun prodotto disponibile</h3>
+            <p>Al momento non ci sono prodotti disponibili. Torna più tardi per scoprire le novità!</p>
+            <div class="empty-actions">
+                <a th:href="@{/}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> 
+                    Torna alla Home
+                </a>
+                <a th:href="@{/product/create}" class="btn btn-secondary" sec:authorize="isAuthenticated()">
+                    <i class="fas fa-plus"></i> 
+                    Aggiungi Prodotto
+                </a>
+            </div>
+        </div>
+        
+        <!-- Enhanced Back to Home Button -->
+        <div th:if="${products != null && !products.isEmpty()}" class="page-actions">
+            <a th:href="@{/}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> 
+                Torna alla Home
+            </a>
+            <a th:href="@{/product/create}" class="btn btn-primary" sec:authorize="isAuthenticated()">
+                <i class="fas fa-plus"></i> 
+                Aggiungi Prodotto
+            </a>
+        </div>
+    </main>
+    
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>

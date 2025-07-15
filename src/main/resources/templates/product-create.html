@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Aggiungi Nuovo Libro - Libreria Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/product-create.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Aggiungi un nuovo libro alla Libreria Sitarello">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <main class="product-create-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1 class="page-title">
+                    <i class="fas fa-book-medical"></i>
+                    Aggiungi Nuovo Libro
+                </h1>
+                <p class="page-subtitle">Completa i passaggi per aggiungere un libro alla libreria</p>
+            </div>
+            <div class="auto-save-indicator">
+                <i class="fas fa-save"></i>
+                <span id="autoSaveStatus">Salvato automaticamente</span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-line" id="progressLine"></div>
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Copertine</div>
+                    <div class="step-icon"><i class="fas fa-book"></i></div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Dettagli Libro</div>
+                    <div class="step-icon"><i class="fas fa-info-circle"></i></div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Anteprima</div>
+                    <div class="step-icon"><i class="fas fa-eye"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <form id="productForm" th:action="@{/product/create}" method="post" enctype="multipart/form-data">
+                <!-- CSRF Token -->
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                
+                <!-- Hidden fields for selected authors -->
+                <div id="selectedAuthorsInputs">
+                    <!-- Gli input nascosti per gli autori selezionati verranno aggiunti qui -->
+                </div>
+                
+                <!-- Step 1: Images -->
+                <div class="form-step active" id="step1">
+                    <div class="step-content">
+                        <div class="step-header">
+                            <h2><i class="fas fa-book"></i> Aggiungi le Copertine del Libro</h2>
+                            <p>Carica da 1 a 5 immagini della copertina. La prima immagine sarà quella principale.</p>
+                        </div>
+
+                        <div class="image-upload-section">
+                            <!-- File input principale -->
+                            <input type="file" 
+                                   id="imageInput" 
+                                   name="images" 
+                                   multiple 
+                                   accept="image/*"
+                                   style="display: none;" />
+                            
+                            <div class="image-upload-area" id="imageUploadArea" style="cursor: pointer;">
+                                <div class="upload-content">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">Trascina le copertine qui o clicca per caricare</div>
+                                    <div class="upload-subtext">Fino a 5 immagini • JPG, PNG, WEBP • Max 5MB ciascuna</div>
+                                    
+                                    <button type="button" class="upload-btn" id="uploadButton">
+                                        <i class="fas fa-plus"></i> Scegli File
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="image-preview-container" id="imagePreviewGrid">
+                                <!-- Le immagini caricate appariranno qui -->
+                            </div>
+
+                            <div class="upload-info">
+                                <div class="info-stats">
+                                    <div class="info-item">
+                                        <i class="fas fa-images"></i>
+                                        <span>Copertine: <strong id="imageCount">0</strong>/5</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="fas fa-hdd"></i>
+                                        <span>Dimensione: <strong id="totalSize">0 MB</strong></span>
+                                    </div>
+                                </div>
+                                <div class="error-message" id="imageError"></div>
+                            </div>
+
+                            <!-- Tips for better images -->
+                            <div class="image-tips">
+                                <h4><i class="fas fa-lightbulb"></i> Consigli per copertine migliori</h4>
+                                <div class="tips-grid">
+                                    <div class="tip-item">
+                                        <i class="fas fa-sun"></i>
+                                        <span>Usa luce naturale</span>
+                                    </div>
+                                    <div class="tip-item">
+                                        <i class="fas fa-book-open"></i>
+                                        <span>Mostra fronte e retro</span>
+                                    </div>
+                                    <div class="tip-item">
+                                        <i class="fas fa-search-plus"></i>
+                                        <span>Evidenzia i dettagli</span>
+                                    </div>
+                                    <div class="tip-item">
+                                        <i class="fas fa-palette"></i>
+                                        <span>Sfondo neutro</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Product Details -->
+                <div class="form-step" id="step2">
+                    <div class="step-content">
+                        <div class="step-header">
+                            <h2><i class="fas fa-book-open"></i> Dettagli del Libro</h2>
+                            <p>Fornisci informazioni complete e accurate sul libro per aiutare altri lettori.</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="productName" class="form-label required">
+                                    <i class="fas fa-heading"></i>
+                                    Titolo del Libro
+                                </label>
+                                <div class="input-with-suggestions">
+                                    <input type="text" 
+                                           id="productName" 
+                                           name="name" 
+                                           class="form-input" 
+                                           placeholder="es. Il Nome della Rosa"
+                                           maxlength="100"
+                                           autocomplete="off" />
+                                    <div class="suggestions-dropdown" id="nameSuggestions"></div>
+                                </div>
+                                <div class="input-counter">
+                                    <span id="productNameCounter">0</span>/100 caratteri
+                                </div>
+                                <div class="field-help">
+                                    <i class="fas fa-info-circle"></i>
+                                    Inserisci il titolo completo del libro
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="productCategory" class="form-label required">
+                                    <i class="fas fa-bookmark"></i>
+                                    Categoria
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="productCategory" name="category" class="form-select">
+                                        <option value="">Seleziona una categoria</option>
+                                        <option th:each="category : ${categories}" 
+                                                th:value="${category.id}" 
+                                                th:text="${category.name}">
+                                            Categoria
+                                        </option>
+                                    </select>
+                                    <i class="fas fa-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="annoPubblicazione" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Anno di Pubblicazione
+                                </label>
+                                <div class="year-input-group">
+                                    <input type="number" 
+                                           id="annoPubblicazione" 
+                                           name="annoPubblicazione" 
+                                           class="form-input" 
+                                           placeholder="2024"
+                                           min="1000"
+                                           max="2024" />
+                                </div>
+                                <div class="field-help">
+                                    <i class="fas fa-info-circle"></i>
+                                    Anno di prima pubblicazione
+                                </div>
+                            </div>
+
+                            <!-- Authors Selection -->
+                            <div class="form-group full-width">
+                                <label for="authors" class="form-label required">
+                                    <i class="fas fa-feather-alt"></i>
+                                    Autori
+                                </label>
+                                <div class="authors-selection">
+                                    <div class="authors-search">
+                                        <input type="text" 
+                                               id="authorSearch" 
+                                               class="form-input" 
+                                               placeholder="Cerca un autore o aggiungi nuovo..."
+                                               autocomplete="off" />
+                                        <button type="button" id="addNewAuthorBtn" class="btn-add-author">
+                                            <i class="fas fa-user-plus"></i>
+                                            Nuovo Autore
+                                        </button>
+                                    </div>
+                                    <div class="authors-suggestions" id="authorsSuggestions"></div>
+                                    <div class="selected-authors" id="selectedAuthors">
+                                        <!-- Selected authors will appear here -->
+                                    </div>
+                                </div>
+                                <div class="field-help">
+                                    <i class="fas fa-info-circle"></i>
+                                    Cerca autori esistenti o creane di nuovi
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="productCondition" class="form-label required">
+                                    <i class="fas fa-star"></i>
+                                    Condizioni
+                                </label>
+                                <div class="condition-selector">
+                                    <input type="radio" id="condition-new" name="condition" value="nuovo" class="condition-radio">
+                                    <label for="condition-new" class="condition-label">
+                                        <i class="fas fa-star"></i>
+                                        <span class="condition-title">Nuovo</span>
+                                        <span class="condition-desc">Mai usato, ancora nella confezione</span>
+                                    </label>
+
+                                    <input type="radio" id="condition-excellent" name="condition" value="eccellente" class="condition-radio">
+                                    <label for="condition-excellent" class="condition-label">
+                                        <i class="fas fa-star"></i>
+                                        <span class="condition-title">Eccellente</span>
+                                        <span class="condition-desc">Usato pochissimo, come nuovo</span>
+                                    </label>
+
+                                    <input type="radio" id="condition-good" name="condition" value="buono" class="condition-radio">
+                                    <label for="condition-good" class="condition-label">
+                                        <i class="fas fa-star"></i>
+                                        <span class="condition-title">Buono</span>
+                                        <span class="condition-desc">Usato ma in buone condizioni</span>
+                                    </label>
+
+                                    <input type="radio" id="condition-fair" name="condition" value="discreto" class="condition-radio">
+                                    <label for="condition-fair" class="condition-label">
+                                        <i class="fas fa-star"></i>
+                                        <span class="condition-title">Discreto</span>
+                                        <span class="condition-desc">Segni d'uso evidenti ma funzionante</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="productDescription" class="form-label required">
+                                    <i class="fas fa-align-left"></i>
+                                    Trama/Descrizione
+                                </label>
+                                <div class="textarea-wrapper">
+                                    <textarea id="productDescription" 
+                                              name="description" 
+                                              class="form-textarea" 
+                                              rows="6"
+                                              placeholder="Descrivi la trama del libro, lo stile narrativo, i temi principali..."
+                                              maxlength="2000"></textarea>
+                                    <div class="textarea-toolbar">
+                                        <button type="button" class="format-btn" data-format="bold" title="Grassetto">
+                                            <i class="fas fa-bold"></i>
+                                        </button>
+                                        <button type="button" class="format-btn" data-format="italic" title="Corsivo">
+                                            <i class="fas fa-italic"></i>
+                                        </button>
+                                        <button type="button" class="format-btn" data-format="list" title="Lista">
+                                            <i class="fas fa-list-ul"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="input-counter">
+                                    <span id="productDescriptionCounter">0</span>/2000 caratteri
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Tips Section -->
+                        <div class="enhanced-tips-section">
+                            <div class="tips-header">
+                                <h3><i class="fas fa-lightbulb"></i> Consigli per aggiungere un buon libro</h3>
+                                <div class="tips-toggle">
+                                    <span>Mostra suggerimenti</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="tips-content">
+                                <div class="tips-categories">
+                                    <div class="tip-category">
+                                        <h4><i class="fas fa-heading"></i> Titolo accurato</h4>
+                                        <ul>
+                                            <li>Inserisci il titolo completo</li>
+                                            <li>Rispetta maiuscole e punteggiatura</li>
+                                            <li>Non aggiungere informazioni extra</li>
+                                        </ul>
+                                    </div>
+                                    <div class="tip-category">
+                                        <h4><i class="fas fa-feather-alt"></i> Autori corretti</h4>
+                                        <ul>
+                                            <li>Cerca prima tra quelli esistenti</li>
+                                            <li>Verifica l'ortografia dei nomi</li>
+                                            <li>Aggiungi tutti gli autori/co-autori</li>
+                                        </ul>
+                                    </div>
+                                    <div class="tip-category">
+                                        <h4><i class="fas fa-align-left"></i> Descrizione utile</h4>
+                                        <ul>
+                                            <li>Descrivi la trama senza spoiler</li>
+                                            <li>Menziona lo stile narrativo</li>
+                                            <li>Indica i temi principali</li>
+                                            <li>Evita giudizi personali</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Enhanced Preview -->
+                <div class="form-step" id="step3">
+                    <div class="step-content">
+                        <div class="step-header">
+                            <h2><i class="fas fa-eye"></i> Anteprima del Prodotto</h2>
+                            <p>Ecco come apparirà il tuo prodotto agli acquirenti. Controlla tutti i dettagli prima di pubblicare.</p>
+                        </div>
+
+                        <div class="preview-container">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <div class="main-image" id="previewMainImageContainer">
+                                        <div class="image-placeholder" id="previewPlaceholder">
+                                            <i class="fas fa-image"></i>
+                                            <span>Nessuna immagine caricata</span>
+                                        </div>
+                                        <img id="previewMainImage" alt="Anteprima prodotto" style="display: none;">
+                                        <div class="image-badges">
+                                            <div class="condition-badge" id="conditionBadge" style="display: none;">
+                                                <i class="fas fa-star"></i>
+                                                <span>Nuovo</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="image-thumbnails" id="previewThumbnails">
+                                        <!-- Thumbnails will be added here -->
+                                    </div>
+                                </div>
+
+                                <div class="product-info">
+                                    <div class="product-header">
+                                        <h3 class="product-title" id="previewTitle">Titolo del libro</h3>
+                                        <div class="product-meta">
+                                            <span class="product-category" id="previewCategory">Categoria</span>
+                                            <span class="product-year" id="previewYear">Anno</span>
+                                            <span class="product-date">Pubblicato oggi</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="book-authors">
+                                        <strong>Autori:</strong>
+                                        <span id="previewAuthors">Nessun autore selezionato</span>
+                                    </div>
+
+                                    <div class="book-description">
+                                        <h4>Trama</h4>
+                                        <p id="previewDescription">Descrizione del libro...</p>
+                                    </div>
+
+                                    <div class="seller-info">
+                                        <div class="seller-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="seller-details">
+                                            <span class="seller-name" th:text="${username}">Admin Libreria</span>
+                                            <div class="seller-stats">
+                                                <span class="status">
+                                                    <i class="fas fa-circle text-success"></i>
+                                                    Libreria Ufficiale
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="product-actions">
+                                        <button type="button" class="btn-action btn-primary">
+                                            <i class="fas fa-book-reader"></i>
+                                            Visualizza Dettagli
+                                        </button>
+                                        <button type="button" class="btn-action btn-secondary">
+                                            <i class="fas fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Navigation Buttons -->
+                <div class="form-navigation">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                        <i class="fas fa-arrow-left"></i> 
+                        <span>Indietro</span>
+                    </button>
+                    
+                    <div class="nav-info">
+                        <div class="step-indicator">
+                            <span id="currentStepText">Passo 1 di 3</span>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="nextBtn">
+                        <span>Avanti</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    
+                    <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                        <i class="fas fa-book-medical"></i> 
+                        <span>Aggiungi Libro</span>
+                        <div class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Modal -->
+        <div class="modal" id="successModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="success-animation">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>Libro Aggiunto con Successo!</h3>
+                    <p>Il tuo libro è ora visibile nella libreria a tutti gli utenti</p>
+                </div>
+                <div class="modal-actions">
+                    <a href="/products" class="btn btn-primary">
+                        <i class="fas fa-eye"></i>
+                        Visualizza Libro
+                    </a>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/product/create'">
+                        <i class="fas fa-plus"></i>
+                        Aggiungi Altro Libro
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+            <div class="loading-content">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <div class="loading-text">Aggiunta in corso...</div>
+                <div class="loading-subtext">Stiamo caricando le copertine e creando la scheda libro</div>
+            </div>
+        </div>
+    </main>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/product-create.js}"></script>
+</body>
+</html>

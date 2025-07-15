@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Libreria Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
+    
+    <!-- Simple navbar replacement -->
+    <nav style="background: rgba(255,255,255,0.95); padding: 1rem; margin-bottom: 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+            <a href="/" style="font-size: 1.5rem; font-weight: bold; text-decoration: none; color: #333;">📚 Libreria Sitarello</a>
+            <div>
+                <a href="/products" style="margin: 0 1rem; text-decoration: none; color: #333;">Libri</a>
+                <a href="/authors" style="margin: 0 1rem; text-decoration: none; color: #333;">Autori</a>
+                <a href="/users/login" style="margin: 0 1rem; text-decoration: none; color: #333;">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Benvenuto nella Libreria Sitarello</h1>
+            <p class="hero-subtitle">Scopri, esplora e condividi la tua passione per i libri.</p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${totalBooks ?: '0'}">0</span>
+                    <span class="stat-label">Libri Disponibili</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${totalAuthors ?: '0'}">0</span>
+                    <span class="stat-label">Autori</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${totalCategories ?: '0'}">0</span>
+                    <span class="stat-label">Categorie</span>
+                </div>
+            </div>
+
+            <div class="hero-actions">
+                <a th:href="@{/products}" class="btn btn-primary">
+                    <i class="fas fa-book-open"></i>
+                    Esplora Libri
+                </a>
+                <a th:href="@{/authors}" class="btn btn-outline">
+                    <i class="fas fa-user-pen"></i>
+                    Scopri Autori
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <!-- Libri Recenti -->
+        <section class="books-section" th:if="${latestBooks != null && !latestBooks.isEmpty()}">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-clock"></i>
+                    Ultimi Libri Aggiunti
+                </h2>
+                <p>Scopri le ultime novità della nostra collezione libraria.</p>
+            </div>
+            <div class="books-grid">
+                <div th:each="book : ${latestBooks}" class="book-card">
+                    <div class="book-cover">
+                        <div th:if="${book.images != null && !book.images.isEmpty()}" class="book-image">
+                            <img th:src="@{'/product/image/' + ${book.images[0].id}}" 
+                                 th:alt="${book.name}">
+                        </div>
+                        <div th:unless="${book.images != null && !book.images.isEmpty()}" class="book-placeholder">
+                            <i class="fas fa-book"></i>
+                        </div>
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-title" th:text="${book.name}">Titolo Libro</h3>
+                        <p class="book-year" th:if="${book.annoPubblicazione}" th:text="${book.annoPubblicazione}">Anno</p>
+                        <p class="book-category" th:if="${book.category}" th:text="${book.category.name}">Categoria</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messaggio se non ci sono libri -->
+        <section class="empty-section" th:if="${latestBooks == null || latestBooks.isEmpty()}">
+            <div class="empty-content">
+                <i class="fas fa-book"></i>
+                <h2>Nessun libro disponibile</h2>
+                <p>La libreria è vuota. Gli amministratori possono aggiungere libri.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Simple footer -->
+    <footer style="background: #333; color: white; text-align: center; padding: 2rem; margin-top: 4rem;">
+        <p>&copy; 2025 Libreria Sitarello. Tutti i diritti riservati.</p>
+    </footer>
+    
+    <script>
+        console.log('Simple homepage loaded successfully!');
+    </script>
+</body>
+</html>

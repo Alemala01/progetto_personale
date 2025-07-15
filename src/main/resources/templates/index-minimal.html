@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Libreria Sitarello</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .simple-navbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            background: #3498db;
+            color: white;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+        }
+        .stat-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FFD700;
+        }
+        .stat-label {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .hero-actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            background: none;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border-color: white;
+        }
+        .btn-outline:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+        }
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        .section-header p {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+        }
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .book-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+        .book-card h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        .book-card p {
+            color: #7f8c8d;
+            margin: 0.5rem 0;
+        }
+        .welcome-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            color: white;
+        }
+        .welcome-card {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .welcome-icon {
+            font-size: 3rem;
+        }
+        .welcome-text h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.8rem;
+        }
+        .welcome-text p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #7f8c8d;
+        }
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            color: #bdc3c7;
+        }
+        .empty-state h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Simple Navbar -->
+    <nav class="simple-navbar">
+        <div class="nav-content">
+            <a href="/" class="nav-brand">📚 Libreria Sitarello</a>
+            <div class="nav-links">
+                <a href="/products"><i class="fas fa-book"></i> Libri</a>
+                <a href="/authors"><i class="fas fa-user-pen"></i> Autori</a>
+                <div th:if="${isAuthenticated}" style="display: flex; gap: 1rem; align-items: center;">
+                    <span style="color: #2c3e50;">Ciao, <strong th:text="${username}">User</strong>!</span>
+                    <a href="/users/profile"><i class="fas fa-user"></i> Profilo</a>
+                    <a th:if="${isAdmin}" href="/product/create"><i class="fas fa-plus"></i> Aggiungi Libro</a>
+                    <a th:if="${isAdmin}" href="/author/create"><i class="fas fa-user-plus"></i> Aggiungi Autore</a>
+                    <form action="/logout" method="post" style="display: inline;">
+                        <button type="submit" class="btn" style="background: none; border: none; color: #2c3e50; padding: 0.5rem 1rem;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </div>
+                <div th:unless="${isAuthenticated}" style="display: flex; gap: 1rem;">
+                    <a href="/users/login"><i class="fas fa-sign-in-alt"></i> Accedi</a>
+                    <a href="/users/register"><i class="fas fa-user-plus"></i> Registrati</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Benvenuto nella Libreria Sitarello</h1>
+            <p class="hero-subtitle">Scopri, esplora e condividi la tua passione per i libri. La biblioteca digitale che unisce lettori e autori.</p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${totalBooks ?: '0'}">0</span>
+                    <span class="stat-label">Libri Disponibili</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${totalAuthors ?: '0'}">0</span>
+                    <span class="stat-label">Autori</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${totalCategories ?: '0'}">0</span>
+                    <span class="stat-label">Categorie</span>
+                </div>
+            </div>
+
+            <div class="hero-actions">
+                <a href="/products" class="btn btn-primary">
+                    <i class="fas fa-book-open"></i>
+                    Esplora Libri
+                </a>
+                <a href="/authors" class="btn btn-outline">
+                    <i class="fas fa-user-pen"></i>
+                    Scopri Autori
+                </a>
+                <a th:if="${isAdmin}" href="/product/create" class="btn btn-success">
+                    <i class="fas fa-plus"></i>
+                    Aggiungi Libro
+                </a>
+                <a th:if="${isAdmin}" href="/author/create" class="btn btn-success">
+                    <i class="fas fa-user-plus"></i>
+                    Aggiungi Autore
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <!-- Messaggio di benvenuto per utenti autenticati -->
+        <div th:if="${isAuthenticated}" class="welcome-section">
+            <div class="welcome-card">
+                <i class="fas fa-book-reader welcome-icon"></i>
+                <div class="welcome-text">
+                    <h2>Ciao, <span th:text="${username}">Lettore</span>!</h2>
+                    <p>Bentornato nella tua libreria digitale. Scopri nuovi libri o scrivi una recensione.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Libri Recenti -->
+        <section th:if="${latestBooks != null && !latestBooks.isEmpty()}">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-clock"></i>
+                    Ultimi Libri Aggiunti
+                </h2>
+                <p>Scopri le ultime novità della nostra collezione libraria.</p>
+            </div>
+            <div class="books-grid">
+                <div th:each="book : ${latestBooks}" class="book-card">
+                    <h3 th:text="${book.name}">Titolo del Libro</h3>
+                    <p th:if="${book.autori != null && !book.autori.isEmpty()}">
+                        <i class="fas fa-user-pen"></i>
+                        <span th:text="${book.getAutoriNames()}">Autori</span>
+                    </p>
+                    <p th:if="${book.annoPubblicazione != null}">
+                        <i class="fas fa-calendar"></i>
+                        <span th:text="${book.annoPubblicazione}">Anno</span>
+                    </p>
+                    <p th:if="${book.category != null}">
+                        <i class="fas fa-tag"></i>
+                        <span th:text="${book.category.name}">Categoria</span>
+                    </p>
+                    <a th:href="@{'/product/details/' + ${book.id}}" class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-eye"></i> Dettagli
+                    </a>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <a href="/products" class="btn btn-outline" style="color: #3498db; border-color: #3498db;">
+                    <i class="fas fa-book-open"></i>
+                    Vedi Tutti i Libri
+                </a>
+            </div>
+        </section>
+
+        <!-- Autori in Evidenza -->
+        <section th:if="${popularAuthors != null && !popularAuthors.isEmpty()}">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-star"></i>
+                    Autori in Evidenza
+                </h2>
+                <p>Scopri gli autori più apprezzati della nostra libreria.</p>
+            </div>
+            <div class="books-grid">
+                <div th:each="author : ${popularAuthors}" class="book-card">
+                    <h3 th:text="${author.nome + ' ' + author.cognome}">Nome Autore</h3>
+                    <p th:if="${author.nazionalita != null}">
+                        <i class="fas fa-globe"></i>
+                        <span th:text="${author.nazionalita}">Nazionalità</span>
+                    </p>
+                    <p th:if="${author.dataNascita != null}">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span th:text="${#temporals.year(author.dataNascita)}">Anno di nascita</span>
+                    </p>
+                    <a th:href="@{'/authors/' + ${author.id}}" class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-eye"></i> Dettagli
+                    </a>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <a href="/authors" class="btn btn-outline" style="color: #3498db; border-color: #3498db;">
+                    <i class="fas fa-users"></i>
+                    Vedi Tutti gli Autori
+                </a>
+            </div>
+        </section>
+
+        <!-- Messaggio per libreria vuota -->
+        <div th:if="${(latestBooks == null || latestBooks.isEmpty()) && (popularAuthors == null || popularAuthors.isEmpty())}" class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h3>La libreria è ancora vuota!</h3>
+            <p>Non ci sono libri da mostrare al momento. La nostra collezione sta crescendo!</p>
+            <a th:if="${isAdmin}" href="/product/create" class="btn btn-success">
+                <i class="fas fa-plus"></i>
+                Aggiungi il primo libro
+            </a>
+            <a th:unless="${isAdmin}" href="/users/register" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Registrati per esplorare
+            </a>
+        </div>
+    </main>
+</body>
+</html>

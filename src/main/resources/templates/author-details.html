@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${author.nome + ' ' + author.cognome + ' - Libreria Sitarello'}">Autore - Libreria Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/author-details.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <main class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a th:href="@{/}">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+            <span class="separator">/</span>
+            <a th:href="@{/authors}">
+                <i class="fas fa-users"></i>
+                Autori
+            </a>
+            <span class="separator">/</span>
+            <span class="current" th:text="${author.nome + ' ' + author.cognome}">Nome Autore</span>
+        </nav>
+
+        <!-- Author Profile -->
+        <div class="author-profile">
+            <div class="author-header">
+                <div class="author-photo-large">
+                    <div th:if="${author.fotografia != null}" class="author-image">
+                        <img th:src="@{'/authors/photo/' + ${author.id}}" 
+                             th:alt="${author.nome + ' ' + author.cognome}"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="author-placeholder" style="display: none;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div th:unless="${author.fotografia != null}" class="author-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                
+                <div class="author-main-info">
+                    <h1 class="author-name" th:text="${author.nome + ' ' + author.cognome}">Nome Autore</h1>
+                    
+                    <div class="author-details">
+                        <div th:if="${author.nazionalita != null}" class="detail-item">
+                            <i class="fas fa-globe"></i>
+                            <span class="detail-label">Nazionalità:</span>
+                            <span class="detail-value" th:text="${author.nazionalita}">Nazionalità</span>
+                        </div>
+                        
+                        <div th:if="${author.dataNascita != null}" class="detail-item">
+                            <i class="fas fa-birthday-cake"></i>
+                            <span class="detail-label">Data di nascita:</span>
+                            <span class="detail-value" th:text="${#temporals.format(author.dataNascita, 'dd MMMM yyyy')}">Data nascita</span>
+                        </div>
+                        
+                        <div th:if="${author.dataMorte != null}" class="detail-item">
+                            <i class="fas fa-cross"></i>
+                            <span class="detail-label">Data di morte:</span>
+                            <span class="detail-value" th:text="${#temporals.format(author.dataMorte, 'dd MMMM yyyy')}">Data morte</span>
+                        </div>
+                        
+                        <div th:if="${author.dataNascita != null && author.dataMorte == null}" class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span class="detail-label">Età:</span>
+                            <span class="detail-value" th:text="${author.getEta() + ' anni'}">Età</span>
+                        </div>
+                        
+                        <div th:if="${author.libri != null && !author.libri.isEmpty()}" class="detail-item">
+                            <i class="fas fa-books"></i>
+                            <span class="detail-label">Opere nella libreria:</span>
+                            <span class="detail-value" th:text="${author.libri.size()} + ' ' + ${author.libri.size() == 1 ? 'libro' : 'libri'}">Numero libri</span>
+                        </div>
+                    </div>
+                    
+                    <div class="author-actions" sec:authorize="hasRole('ADMIN')">
+                        <a th:href="@{'/authors/edit/' + ${author.id}}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i>
+                            Modifica Autore
+                        </a>
+                        <form th:action="@{'/authors/delete/' + ${author.id}}" method="post" 
+                              style="display: inline;" 
+                              onsubmit="return confirm('Sei sicuro di voler eliminare questo autore? Questa azione rimuoverà anche tutti i suoi libri!');">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i>
+                                Elimina Autore
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Biography Section -->
+            <div th:if="${author.biografia != null && !#strings.isEmpty(author.biografia)}" class="biography-section">
+                <h2>
+                    <i class="fas fa-user-circle"></i>
+                    Biografia
+                </h2>
+                <div class="biography-content">
+                    <p th:text="${author.biografia}">Biografia dell'autore</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Books by this Author -->
+        <div class="author-books-section" th:if="${author.libri != null && !author.libri.isEmpty()}">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-book-open"></i>
+                    Opere di <span th:text="${author.nome + ' ' + author.cognome}">Nome Autore</span>
+                </h2>
+                <p>Scopri i libri di questo autore presenti nella nostra libreria</p>
+            </div>
+            
+            <div class="books-grid">
+                <div th:each="book : ${author.libri}" class="book-card"
+                     th:onclick="'window.location.href=\'' + @{'/product/details/' + ${book.id}} + '\''">
+                    <div class="book-cover">
+                        <div th:if="${book.images != null && !book.images.isEmpty()}" class="book-image">
+                            <img th:src="@{'/product/image/' + ${book.images[0].id}}" 
+                                 th:alt="${book.name}" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="book-placeholder" style="display: none;">
+                                <i class="fas fa-book"></i>
+                            </div>
+                        </div>
+                        <div th:unless="${book.images != null && !book.images.isEmpty()}" class="book-placeholder">
+                            <i class="fas fa-book"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="book-info">
+                        <h3 class="book-title" th:text="${book.name}">Titolo del Libro</h3>
+                        
+                        <div class="book-details">
+                            <p th:if="${book.annoPubblicazione != null}" class="book-year">
+                                <i class="fas fa-calendar"></i>
+                                <span th:text="${book.annoPubblicazione}">Anno</span>
+                            </p>
+                            
+                            <p th:if="${book.category != null}" class="book-category">
+                                <i class="fas fa-tag"></i>
+                                <span th:text="${book.category.name}">Categoria</span>
+                            </p>
+                            
+                            <p th:if="${book.autori != null && book.autori.size() > 1}" class="book-coauthors">
+                                <i class="fas fa-users"></i>
+                                <span>Co-autori: </span>
+                                <span th:text="${book.getAutoriNames()}">Altri autori</span>
+                            </p>
+                        </div>
+                        
+                        <div class="book-description" th:if="${book.description != null && !#strings.isEmpty(book.description)}">
+                            <p th:text="${#strings.abbreviate(book.description, 120)}">Descrizione breve del libro...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="book-actions">
+                        <a th:href="@{'/product/details/' + ${book.id}}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i>
+                            Dettagli
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Books Message -->
+        <div th:unless="${author.libri != null && !author.libri.isEmpty()}" class="no-books-section">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>Nessun libro disponibile</h3>
+                <p>Non ci sono ancora libri di questo autore nella nostra libreria.</p>
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/product/create}" class="btn btn-success">
+                    <i class="fas fa-plus"></i>
+                    Aggiungi un libro
+                </a>
+            </div>
+        </div>
+
+        <!-- Back to Authors -->
+        <div class="navigation-footer">
+            <a th:href="@{/authors}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i>
+                Torna agli autori
+            </a>
+            <a th:href="@{/products}" class="btn btn-outline">
+                <i class="fas fa-book-open"></i>
+                Esplora tutti i libri
+            </a>
+        </div>
+    </main>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script th:src="@{/js/author-details.js}"></script>
+</body>
+</html>

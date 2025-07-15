@@ -1,0 +1,1146 @@
+/* Global Styles & Navbar - Sitarello */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Navbar Styles */
+.navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(-100%);
+    animation: slideDown 0.8s ease-out 0.2s forwards;
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+.navbar:hover {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.5);
+    transform: translateY(0) scale(1.01);
+}
+
+/* Animazione entrata navbar */
+@keyframes slideDown {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.nav-brand {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #667eea;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    transform: translateX(-50px);
+    opacity: 0;
+    animation: slideInFromLeft 0.8s ease-out 0.4s forwards;
+}
+
+.nav-brand::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
+    background-size: 200% 200%;
+    border-radius: 10px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    animation: gradientShift 3s ease infinite;
+}
+
+.nav-brand:hover::before {
+    opacity: 0.1;
+}
+
+.nav-brand a {
+    color: inherit;
+    text-decoration: none;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: inline-block;
+}
+
+.nav-brand a:hover {
+    transform: scale(1.1) rotate(2deg);
+    filter: brightness(1.2);
+}
+
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-50px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.nav-search {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 2rem;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideInFromBottom 0.8s ease-out 0.6s forwards;
+}
+
+.nav-search form {
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.nav-search form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-search form:hover::before {
+    left: 100%;
+}
+
+.nav-search form:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+}
+
+.nav-search form:focus-within {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px) scale(1.02);
+}
+
+.nav-search input {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: #333;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.nav-search input:focus {
+    color: #667eea;
+}
+
+.nav-search input::placeholder {
+    color: #999;
+    transition: all 0.3s ease;
+}
+
+.nav-search input:focus::placeholder {
+    color: #bbb;
+    transform: translateX(5px);
+}
+
+.nav-search button {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-search button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.3s ease;
+}
+
+.nav-search button:hover::before {
+    left: 100%;
+}
+
+.nav-search button:hover {
+    background: linear-gradient(45deg, #764ba2, #667eea);
+    transform: scale(1.05);
+}
+
+.nav-search button:active {
+    transform: scale(0.95);
+}
+
+@keyframes slideInFromBottom {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transform: translateX(50px);
+    opacity: 0;
+    animation: slideInFromRight 0.8s ease-out 0.8s forwards;
+    flex-shrink: 0;
+}
+
+.nav-links > div {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-links a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Rimuovo le animazioni staggered problematiche per i link */
+.nav-links a:nth-child(1),
+.nav-links a:nth-child(2), 
+.nav-links a:nth-child(3),
+.nav-links a:nth-child(4) {
+    animation: none;
+    transform: none;
+    opacity: 1;
+}
+
+.nav-links a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+    border-radius: 20px;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-50%);
+}
+
+.nav-links a:hover::before {
+    left: 0;
+}
+
+.nav-links a:hover::after {
+    width: 80%;
+}
+
+.nav-links a:hover {
+    color: #667eea;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(50px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Dropdown Styles */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+    z-index: 1002;
+}
+
+.dropdown-toggle {
+    color: #333;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(102, 126, 234, 0.1);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    min-width: fit-content;
+}
+
+.dropdown-toggle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 20px;
+}
+
+.dropdown-toggle:hover::before {
+    opacity: 1;
+}
+
+.dropdown-toggle:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.dropdown-toggle::after {
+    content: '▼';
+    font-size: 0.8rem;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 0.5rem;
+}
+
+.dropdown:hover .dropdown-toggle::after {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    min-width: 180px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(31, 38, 135, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-20px) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1001;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0;
+    border-radius: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.dropdown-menu a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    transition: left 0.3s ease;
+}
+
+.dropdown-menu a:hover::before {
+    left: 0;
+}
+
+.dropdown-menu a:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    transform: translateX(8px);
+    padding-left: 2rem;
+}
+
+.nav-logout {
+    margin: 0;
+    padding: 0;
+}
+
+.nav-logout button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    color: #e74c3c;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.nav-logout button:hover {
+    background: rgba(231, 76, 60, 0.1);
+    transform: translateX(5px);
+}
+
+/* Effetti avanzati per la navbar */
+.navbar-enhanced {
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.navbar-enhanced:hover::before {
+    opacity: 1;
+}
+
+/* Effetto di typing per il brand */
+.nav-brand-typing {
+    overflow: hidden;
+    border-right: 0.15em solid #667eea;
+    white-space: nowrap;
+    animation: typing 2s steps(9, end) 1s forwards, blink-caret 0.75s step-end infinite;
+    width: 0;
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes blink-caret {
+    from, to {
+        border-color: transparent;
+    }
+    50% {
+        border-color: #667eea;
+    }
+}
+
+/* Particelle animate per hover sulla navbar */
+.navbar-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.navbar-particles::before,
+.navbar-particles::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #667eea;
+    border-radius: 50%;
+    opacity: 0;
+    animation: particleFloat 4s infinite ease-in-out;
+}
+
+.navbar-particles::before {
+    top: 20%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.navbar-particles::after {
+    top: 60%;
+    left: 80%;
+    animation-delay: 2s;
+}
+
+@keyframes particleFloat {
+    0%, 100% {
+        transform: translateY(0) scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-20px) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Effetto magnetico per i link */
+.nav-links a.magnetic {
+    transition: transform 0.1s ease;
+}
+
+/* Ripple effect per i click */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.6);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Glow effect per stati attivi */
+.nav-glow {
+    position: relative;
+}
+
+.nav-glow::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    border-radius: inherit;
+    filter: blur(10px);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+}
+
+.nav-glow:hover::after {
+    opacity: 0.3;
+}
+
+/* Miglioramento dell'animazione di scroll */
+.navbar-scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.5);
+    transform: translateY(0) scale(0.98);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth scroll indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.navbar:hover .scroll-indicator {
+    transform: scaleX(1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        animation: slideDown 0.6s ease-out 0.2s forwards;
+    }
+    
+    .nav-brand {
+        animation: slideInFromLeft 0.6s ease-out 0.3s forwards;
+    }
+    
+    .nav-search {
+        max-width: 100%;
+        margin: 0;
+        animation: slideInFromBottom 0.6s ease-out 0.4s forwards;
+    }
+    
+    .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        animation: slideInFromRight 0.6s ease-out 0.5s forwards;
+    }
+    
+    .nav-links > div {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .nav-links a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    
+    .dropdown {
+        position: static;
+    }
+    
+    .dropdown-menu {
+        position: static;
+        transform: none;
+        opacity: 1;
+        visibility: visible;
+        box-shadow: none;
+        background: transparent;
+        margin: 0.5rem 0;
+        border: none;
+        padding: 0;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 0.8rem;
+        animation: slideDown 0.5s ease-out 0.1s forwards;
+    }
+    
+    .nav-brand {
+        font-size: 1.5rem;
+        animation: slideInFromLeft 0.5s ease-out 0.2s forwards;
+    }
+    
+    .nav-search {
+        animation: slideInFromBottom 0.5s ease-out 0.3s forwards;
+    }
+    
+    .nav-search input {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .nav-search button {
+        padding: 0.6rem 1rem;
+    }
+    
+    .nav-links {
+        animation: slideInFromRight 0.5s ease-out 0.4s forwards;
+        gap: 0.3rem;
+    }
+    
+    .nav-links > div {
+        gap: 0.3rem;
+    }
+    
+    .nav-links a {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .dropdown-toggle {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Media query per schermi medi dove potrebbero esserci problemi di spazio */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .navbar {
+        padding: 1rem 1.5rem;
+    }
+    
+    .nav-search {
+        max-width: 300px;
+        margin: 0 1rem;
+    }
+    
+    .nav-links {
+        gap: 1rem;
+    }
+    
+    .nav-links a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .dropdown-toggle {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Fix per evitare overflow su schermi stretti */
+@media (max-width: 1200px) {
+    .navbar {
+        overflow-x: auto;
+    }
+    
+    .nav-links {
+        flex-shrink: 0;
+        min-width: fit-content;
+    }
+}
+
+/* Migliore gestione dello spazio per la navbar */
+.navbar {
+    min-height: 60px;
+    box-sizing: border-box;
+}
+
+.nav-links > div:first-child {
+    margin-right: 1rem;
+}
+
+/* Assicura che il dropdown non si sovrapponga */
+.dropdown-menu {
+    min-width: 180px;
+    max-width: 250px;
+    width: max-content;
+}
+
+/* Loading bar per la navbar */
+.navbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    animation: loadingBar 2s ease-in-out 0.5s forwards;
+}
+
+@keyframes loadingBar {
+    0% {
+        width: 0;
+    }
+    50% {
+        width: 100%;
+    }
+    100% {
+        width: 0;
+        left: 100%;
+    }
+}
+
+/* Effetto pulsante per links attivi */
+.nav-links a.active {
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+    color: #667eea;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Micro-animazioni per feedback tattile */
+.nav-links a:active,
+.dropdown-toggle:active {
+    transform: scale(0.95);
+}
+
+.nav-search button:active {
+    transform: scale(0.9);
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-up {
+    animation: slideUp 0.6s ease-in-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ulteriori miglioramenti per la navbar */
+.navbar-brand-container {
+    position: relative;
+    display: inline-block;
+}
+
+.navbar-brand-container::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 10px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    filter: blur(5px);
+}
+
+.navbar-brand-container:hover::before {
+    opacity: 0.3;
+}
+
+/* Separatori animati */
+.nav-separator {
+    width: 1px;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent, #667eea, transparent);
+    margin: 0 1rem;
+    opacity: 0.3;
+    animation: separatorPulse 2s ease-in-out infinite;
+}
+
+@keyframes separatorPulse {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scaleY(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scaleY(1.2);
+    }
+}
+
+/* Effetto neon per stati attivi */
+.nav-neon {
+    position: relative;
+    color: #667eea;
+    text-shadow: 0 0 5px #667eea, 0 0 10px #667eea, 0 0 20px #667eea;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+}
+
+/* Animazione di caricamento per i link */
+.nav-link-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-link-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-link-loading:hover::after {
+    left: 100%;
+}
+
+/* Indicatore di stato per collegamenti attivi */
+.nav-active-indicator {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: #667eea;
+    border-radius: 50%;
+    transform: translateX(-50%) scale(0);
+    transition: transform 0.3s ease;
+}
+
+.nav-links a.active .nav-active-indicator {
+    transform: translateX(-50%) scale(1);
+}
+
+/* Effetto focus migliorato per accessibilità */
+.nav-focus-ring {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Micro-animazioni per feedback immediate */
+.nav-feedback {
+    transform: scale(0.95);
+    filter: brightness(0.9);
+    transition: all 0.1s ease;
+}
+
+/* Stile per dropdown items */
+.dropdown-item-enhanced {
+    position: relative;
+    padding: 0.75rem 1.5rem;
+    margin: 2px 0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item-enhanced:hover {
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    transform: translateX(5px);
+}
+
+/* Animazione di typing per placeholder */
+.search-placeholder-animation::placeholder {
+    animation: placeholderType 4s infinite;
+}
+
+@keyframes placeholderType {
+    0%, 20% { content: "Cerca..."; }
+    25%, 45% { content: "Trova prodotti..."; }
+    50%, 70% { content: "Scopri offerte..."; }
+    75%, 95% { content: "Esplora categorie..."; }
+    100% { content: "Cerca..."; }
+}
+
+/* Effetto glitch per hover estremo */
+.nav-glitch {
+    position: relative;
+}
+
+.nav-glitch:hover::before,
+.nav-glitch:hover::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: #667eea;
+    clip: rect(0, 0, 0, 0);
+    animation: glitch 0.3s infinite;
+}
+
+.nav-glitch:hover::before {
+    animation-delay: -0.1s;
+    color: #764ba2;
+}
+
+@keyframes glitch {
+    0% { clip: rect(42px, 9999px, 44px, 0); }
+    5% { clip: rect(12px, 9999px, 59px, 0); }
+    10% { clip: rect(48px, 9999px, 29px, 0); }
+    15% { clip: rect(42px, 9999px, 73px, 0); }
+    20% { clip: rect(63px, 9999px, 27px, 0); }
+    25% { clip: rect(34px, 9999px, 55px, 0); }
+    30% { clip: rect(86px, 9999px, 73px, 0); }
+    35% { clip: rect(20px, 9999px, 20px, 0); }
+    40% { clip: rect(26px, 9999px, 60px, 0); }
+    45% { clip: rect(25px, 9999px, 66px, 0); }
+    50% { clip: rect(57px, 9999px, 98px, 0); }
+    55% { clip: rect(5px, 9999px, 46px, 0); }
+    60% { clip: rect(82px, 9999px, 31px, 0); }
+    65% { clip: rect(54px, 9999px, 27px, 0); }
+    70% { clip: rect(28px, 9999px, 99px, 0); }
+    75% { clip: rect(45px, 9999px, 69px, 0); }
+    80% { clip: rect(23px, 9999px, 85px, 0); }
+    85% { clip: rect(96px, 9999px, 25px, 0); }
+    90% { clip: rect(66px, 9999px, 32px, 0); }
+    95% { clip: rect(42px, 9999px, 14px, 0); }
+    100% { clip: rect(71px, 9999px, 91px, 0); }
+}
+
+/* Stili per gestione responsive JavaScript */
+.navbar-mobile {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 1rem !important;
+}
+
+.navbar-mobile .nav-links {
+    width: 100% !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+}
+
+.navbar-mobile .nav-links > div {
+    width: 100% !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+}
+
+.dropdown-mobile .dropdown-menu {
+    position: static !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-shadow: none !important;
+    background: rgba(102, 126, 234, 0.1) !important;
+    margin: 0.5rem 0 !important;
+    border: none !important;
+    border-radius: 15px !important;
+    display: none; /* Nascosto di default, controllato da JS */
+}
+
+.dropdown-mobile .dropdown-menu a {
+    padding: 0.5rem 1rem !important;
+    margin: 0.2rem 0 !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Animazione per il toggle del menu mobile */
+.dropdown-mobile .dropdown-menu.show {
+    display: block !important;
+    animation: slideInMobile 0.3s ease-out !important;
+}
+
+@keyframes slideInMobile {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Migliore gestione del gap sui link */
+.nav-links a + .dropdown {
+    margin-left: 0.5rem;
+}
+
+/* Stili per link caricati */
+.nav-loaded {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+/* Prevenzione overflow orizzontale */
+.navbar,
+.nav-links {
+    overflow-x: visible;
+}
+
+/* Assicura che tutti gli elementi abbiano spazio sufficiente */
+.nav-links > * {
+    flex-shrink: 0;
+}
+
+/* Fix per z-index del dropdown */
+.dropdown-menu {
+    z-index: 9999 !important;
+}

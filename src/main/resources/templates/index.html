@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Libreria Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
+    
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <div class="hero-section">
+        <div class="hero-background">
+            <div class="hero-pattern"></div>
+            <div class="hero-glow"></div>
+        </div>
+        
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-book"></i>
+                <span>Libreria Digitale #1 in Italia</span>
+            </div>
+            
+            <h1 class="hero-title">Benvenuto nella Libreria Sitarello</h1>
+            <p class="hero-subtitle">Scopri, esplora e condividi la tua passione per i libri. La biblioteca digitale che unisce lettori e autori.</p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${totalBooks ?: '1K+'}">1K+</span>
+                    <span class="stat-label">Libri Disponibili</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${totalAuthors ?: '500+'}">500+</span>
+                    <span class="stat-label">Autori</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${totalCategories ?: '20+'}">20+</span>
+                    <span class="stat-label">Categorie</span>
+                </div>
+            </div>
+
+            <div class="hero-search">
+                <form th:action="@{/products}" method="get" class="search-form">
+                    <div class="search-container">
+                        <input type="text" name="searchTerm" class="search-input" placeholder="Cerca libri, autori, categorie...">
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i>
+                            Cerca
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="hero-actions">
+                <a th:href="@{/products}" class="btn btn-primary">
+                    <i class="fas fa-book-open"></i>
+                    Esplora Libri
+                </a>
+                <a th:href="@{/authors}" class="btn btn-outline">
+                    <i class="fas fa-user-pen"></i>
+                    Scopri Autori
+                </a>
+                <!-- Pulsanti solo per admin -->
+                <a th:if="${isAdmin}" th:href="@{/product/create}" class="btn btn-success">
+                    <i class="fas fa-plus"></i>
+                    Aggiungi Libro
+                </a>
+                <a th:if="${isAdmin}" th:href="@{/author/create}" class="btn btn-success">
+                    <i class="fas fa-user-plus"></i>
+                    Aggiungi Autore
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <!-- Messaggio di benvenuto per utenti autenticati -->
+        <div th:if="${isAuthenticated}" class="welcome-section">
+            <div class="welcome-card">
+                <i class="fas fa-book-reader welcome-icon"></i>
+                <div class="welcome-text">
+                    <h2>Ciao, <span th:text="${username}">Lettore</span>!</h2>
+                    <p>Bentornato nella tua libreria digitale. Scopri nuovi libri o scrivi una recensione.</p>
+                </div>
+                <div class="welcome-actions">
+                    <a th:href="@{/users/profile}" class="btn btn-sm">
+                        <i class="fas fa-user"></i>
+                        Mio Profilo
+                    </a>
+                    <button class="btn btn-sm btn-outline" id="closeWelcome">Chiudi</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Libri Recenti -->
+        <section class="books-section" th:if="${latestBooks != null && !latestBooks.isEmpty()}">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-clock"></i>
+                    Ultimi Libri Aggiunti
+                </h2>
+                <p>Scopri le ultime novità della nostra collezione libraria.</p>
+            </div>
+            <div class="books-grid">
+                <div th:each="book : ${latestBooks}" class="book-card">
+                    <a th:href="@{'/product/details/' + ${book.id}}" style="text-decoration: none; color: inherit;">
+                        <div class="book-cover">
+                            <div th:if="${book.images != null && !book.images.isEmpty()}" class="book-image">
+                                <img th:src="@{'/product/image/' + ${book.images[0].id}}" 
+                                     th:alt="${book.titolo}" 
+                                     class="book-img-fallback">
+                                <div class="book-placeholder" style="display: none;">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                            </div>
+                            <div th:unless="${book.images != null && !book.images.isEmpty()}" class="book-placeholder">
+                                <i class="fas fa-book"></i>
+                            </div>
+                        </div>
+                        <div class="book-info">
+                            <h3 class="book-title" th:text="${book.titolo}">Titolo del Libro</h3>
+                            <p class="book-authors" th:if="${book.autori != null && !book.autori.isEmpty()}">
+                                <i class="fas fa-user-pen"></i>
+                                <span th:text="${book.getAutoriNames()}">Autori</span>
+                            </p>
+                            <p class="book-year" th:if="${book.annoPubblicazione != null}">
+                                <i class="fas fa-calendar"></i>
+                                <span th:text="${book.annoPubblicazione}">Anno</span>
+                            </p>
+                            <p class="book-category" th:if="${book.category != null}">
+                                <i class="fas fa-tag"></i>
+                                <span th:text="${book.category.name}">Categoria</span>
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="section-footer">
+                <a th:href="@{/products}" class="btn btn-outline">
+                    <i class="fas fa-book-open"></i>
+                    Vedi Tutti i Libri
+                </a>
+            </div>
+        </section>
+
+        <!-- Autori in Evidenza -->
+        <section class="authors-section" th:if="${popularAuthors != null && !popularAuthors.isEmpty()}">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-star"></i>
+                    Autori in Evidenza
+                </h2>
+                <p>Scopri gli autori più apprezzati della nostra libreria.</p>
+            </div>
+            <div class="authors-grid">
+                <div th:each="author : ${popularAuthors}" class="author-card">
+                    <a th:href="@{'/authors/' + ${author.id}}" style="text-decoration: none; color: inherit;">
+                        <div class="author-photo">
+                            <div th:if="${author.fotografia != null}" class="author-image">
+                                <img th:src="@{'/authors/photo/' + ${author.id}}" 
+                                     th:alt="${author.nome + ' ' + author.cognome}"
+                                     class="author-img-fallback">
+                                <div class="author-placeholder" style="display: none;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                            <div th:unless="${author.fotografia != null}" class="author-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="author-info">
+                            <h3 class="author-name" th:text="${author.nome + ' ' + author.cognome}">Nome Autore</h3>
+                            <p class="author-nationality" th:if="${author.nazionalita != null}">
+                                <i class="fas fa-globe"></i>
+                                <span th:text="${author.nazionalita}">Nazionalità</span>
+                            </p>
+                            <p class="author-birth" th:if="${author.dataNascita != null}">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span th:text="${author.getEta() != null ? author.getEta() + ' anni' : 'Nato nel ' + #temporals.year(author.dataNascita)}">Età</span>
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="section-footer">
+                <a th:href="@{/authors}" class="btn btn-outline">
+                    <i class="fas fa-users"></i>
+                    Vedi Tutti gli Autori
+                </a>
+            </div>
+        </section>
+
+        <!-- Categorie di Libri -->
+        <section class="categories-section" th:if="${categories != null && !categories.isEmpty()}">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-list"></i>
+                    Esplora per Categoria
+                </h2>
+                <p>Scopri i libri organizzati per genere letterario e argomento.</p>
+            </div>
+            <div class="categories-grid">
+                <a th:each="category : ${categories}" 
+                   th:href="@{/products(category=${category.id})}" 
+                   class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-bookmark"></i>
+                    </div>
+                    <h3 th:text="${category.name}">Nome Categoria</h3>
+                    <span class="category-description" th:text="${'Libri di ' + #strings.toLowerCase(category.name)}">Descrizione categoria</span>
+                </a>
+            </div>
+            <div class="section-footer">
+                <a th:href="@{/products}" class="btn btn-outline">
+                    <i class="fas fa-th-large"></i>
+                    Vedi Tutte le Categorie
+                </a>
+            </div>
+        </section>
+
+        <!-- Messaggio per libreria vuota -->
+        <div th:if="${(latestBooks == null || latestBooks.isEmpty()) && (popularAuthors == null || popularAuthors.isEmpty())}" class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h3>La libreria è ancora vuota!</h3>
+            <p>Non ci sono libri da mostrare al momento. La nostra collezione sta crescendo!</p>
+            <a th:if="${isAdmin}" th:href="@{/product/create}" class="btn btn-success">
+                <i class="fas fa-plus"></i>
+                Aggiungi il primo libro
+            </a>
+            <a th:unless="${isAdmin}" th:href="@{/users/register}" class="btn">
+                <i class="fas fa-user-plus"></i>
+                Registrati per esplorare
+            </a>
+        </div>
+        
+    </main>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script th:src="@{/js/homepage.js}"></script>
+    <script>
+        // Handle close welcome button
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeBtn = document.getElementById('closeWelcome');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    const welcomeSection = document.querySelector('.welcome-section');
+                    if (welcomeSection) {
+                        welcomeSection.style.opacity = '0';
+                        welcomeSection.style.transform = 'translateY(-20px)';
+                        setTimeout(() => { welcomeSection.style.display = 'none'; }, 300);
+                    }
+                });
+            }
+            
+            // Handle image fallbacks
+            document.querySelectorAll('.book-img-fallback').forEach(img => {
+                img.addEventListener('error', function() {
+                    this.style.display = 'none';
+                    const placeholder = this.nextElementSibling;
+                    if (placeholder) {
+                        placeholder.style.display = 'flex';
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.author-img-fallback').forEach(img => {
+                img.addEventListener('error', function() {
+                    this.style.display = 'none';
+                    const placeholder = this.nextElementSibling;
+                    if (placeholder) {
+                        placeholder.style.display = 'flex';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrivi una Recensione - Libreria Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/review-create.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <main class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a th:href="@{/}">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+            <span class="separator">/</span>
+            <a th:href="@{/products}">
+                <i class="fas fa-book-open"></i>
+                Libri
+            </a>
+            <span class="separator">/</span>
+            <a th:href="@{'/product/details/' + ${libro.id}}" th:text="${libro.name}">
+                Titolo del Libro
+            </a>
+            <span class="separator">/</span>
+            <span class="current">Scrivi Recensione</span>
+        </nav>
+
+        <!-- Review Form -->
+        <div class="review-form-container">
+            <div class="form-header">
+                <h1>
+                    <i class="fas fa-star"></i>
+                    Scrivi una Recensione
+                </h1>
+                <p>Condividi la tua opinione su questo libro con altri lettori</p>
+            </div>
+
+            <!-- Book Info -->
+            <div class="book-info-card">
+                <div class="book-cover">
+                    <div th:if="${libro.images != null && !libro.images.isEmpty()}" class="book-image">
+                        <img th:src="@{'/product/image/' + ${libro.images[0].id}}" 
+                             th:alt="${libro.name}" 
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="book-placeholder" style="display: none;">
+                            <i class="fas fa-book"></i>
+                        </div>
+                    </div>
+                    <div th:unless="${libro.images != null && !libro.images.isEmpty()}" class="book-placeholder">
+                        <i class="fas fa-book"></i>
+                    </div>
+                </div>
+                
+                <div class="book-details">
+                    <h2 th:text="${libro.name}">Titolo del Libro</h2>
+                    <p th:if="${libro.autori != null && !libro.autori.isEmpty()}" class="book-authors">
+                        <i class="fas fa-user-pen"></i>
+                        <span th:text="${libro.getAutoriNames()}">Autori</span>
+                    </p>
+                    <p th:if="${libro.annoPubblicazione != null}" class="book-year">
+                        <i class="fas fa-calendar"></i>
+                        <span th:text="${libro.annoPubblicazione}">Anno</span>
+                    </p>
+                    <p th:if="${libro.category != null}" class="book-category">
+                        <i class="fas fa-tag"></i>
+                        <span th:text="${libro.category.name}">Categoria</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Review Form -->
+            <form th:action="@{/review/create}" method="post" th:object="${reviewFormDTO}" class="review-form">
+                <input type="hidden" th:field="*{libroId}" />
+                
+                <!-- Title Field -->
+                <div class="form-group">
+                    <label for="titolo" class="form-label">
+                        <i class="fas fa-heading"></i>
+                        Titolo della Recensione *
+                    </label>
+                    <input type="text" 
+                           id="titolo" 
+                           th:field="*{titolo}"
+                           class="form-input"
+                           placeholder="Dai un titolo alla tua recensione..."
+                           maxlength="100"
+                           required>
+                    <div th:if="${#fields.hasErrors('titolo')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{titolo}">Errore titolo</span>
+                    </div>
+                    <div class="form-help">Massimo 100 caratteri</div>
+                </div>
+
+                <!-- Rating Field -->
+                <div class="form-group">
+                    <label for="voto" class="form-label">
+                        <i class="fas fa-star"></i>
+                        Valutazione *
+                    </label>
+                    <div class="rating-input">
+                        <div class="star-rating">
+                            <input type="radio" id="star5" th:field="*{voto}" value="5" />
+                            <label for="star5" class="star" title="Eccellente">
+                                <i class="fas fa-star"></i>
+                            </label>
+                            
+                            <input type="radio" id="star4" th:field="*{voto}" value="4" />
+                            <label for="star4" class="star" title="Molto buono">
+                                <i class="fas fa-star"></i>
+                            </label>
+                            
+                            <input type="radio" id="star3" th:field="*{voto}" value="3" />
+                            <label for="star3" class="star" title="Buono">
+                                <i class="fas fa-star"></i>
+                            </label>
+                            
+                            <input type="radio" id="star2" th:field="*{voto}" value="2" />
+                            <label for="star2" class="star" title="Sufficiente">
+                                <i class="fas fa-star"></i>
+                            </label>
+                            
+                            <input type="radio" id="star1" th:field="*{voto}" value="1" />
+                            <label for="star1" class="star" title="Scarso">
+                                <i class="fas fa-star"></i>
+                            </label>
+                        </div>
+                        <div class="rating-text">
+                            <span id="rating-description">Seleziona una valutazione</span>
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('voto')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{voto}">Errore voto</span>
+                    </div>
+                    <div class="form-help">Da 1 (scarso) a 5 (eccellente) stelle</div>
+                </div>
+
+                <!-- Review Text Field -->
+                <div class="form-group">
+                    <label for="testo" class="form-label">
+                        <i class="fas fa-edit"></i>
+                        Recensione *
+                    </label>
+                    <textarea id="testo" 
+                              th:field="*{testo}"
+                              class="form-textarea"
+                              placeholder="Scrivi qui la tua recensione dettagliata del libro..."
+                              rows="8"
+                              maxlength="1000"
+                              required></textarea>
+                    <div th:if="${#fields.hasErrors('testo')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{testo}">Errore testo</span>
+                    </div>
+                    <div class="form-help">
+                        <span id="char-count">0</span>/1000 caratteri
+                    </div>
+                </div>
+
+                <!-- Guidelines -->
+                <div class="review-guidelines">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        Linee guida per la recensione
+                    </h3>
+                    <ul>
+                        <li>Scrivi una recensione onesta e costruttiva</li>
+                        <li>Evita spoiler importanti sulla trama</li>
+                        <li>Concentrati sullo stile, i personaggi e l'impatto emotivo</li>
+                        <li>Rispetta gli altri lettori e l'autore</li>
+                        <li>Una volta pubblicata, solo gli amministratori possono eliminarla</li>
+                    </ul>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                        Pubblica Recensione
+                    </button>
+                    <a th:href="@{'/product/details/' + ${libro.id}}" class="btn btn-outline">
+                        <i class="fas fa-times"></i>
+                        Annulla
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script th:src="@{/js/review-create.js}"></script>
+</body>
+</html>

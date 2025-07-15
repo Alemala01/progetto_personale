@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Profilo Venditore</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/seller-profile.css}" />
+    <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    
+    <main class="container">
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-avatar" th:text="${sellerUsername.substring(0,1).toUpperCase()}">U</div>
+                <div class="profile-info">
+                    <h2>
+                        <span th:text="${sellerUsername}">Nome Venditore</span>
+                        <span class="profile-badge" th:if="${sellerProducts.size() > 5}">
+                            <i class="fas fa-certificate"></i> Venditore Esperto
+                        </span>
+                    </h2>
+                    <p><i class="fas fa-store"></i> Venditore su Sitarello</p>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-box"></i> 
+                            <span th:text="${sellerProducts.size()}">0</span> prodotti
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-calendar-alt"></i> Dal 2025
+                        </div>
+                        <div class="stat-item" th:if="${totalSellerRatings > 0}">
+                            <i class="fas fa-star"></i>
+                            <span th:text="${#numbers.formatDecimal(averageSellerRating, 1, 1)}">0.0</span>
+                            <div th:replace="~{fragments/rating-stars :: rating-stars(${averageSellerRating}, ${totalSellerRatings})}"></div>
+                        </div>
+                        <div class="stat-item" th:unless="${totalSellerRatings > 0}">
+                            <i class="fas fa-star"></i> Nessuna valutazione
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="seller-sections">
+            <div class="seller-products-main">
+                <div class="products-heading">
+                    <h3>Prodotti di <span th:text="${sellerUsername}">Nome Venditore</span></h3>
+                    
+                    <div class="product-filters">
+                        <button class="filter-btn active">Tutti</button>
+                        <button class="filter-btn">Recenti</button>
+                        <button class="filter-btn">Prezzo Basso</button>
+                        <button class="filter-btn">Prezzo Alto</button>
+                    </div>
+                </div>
+                
+                <div th:if="${sellerProducts.isEmpty()}" class="empty-products">
+                    <p>Questo venditore non ha ancora prodotti.</p>
+                </div>
+                
+                <div th:unless="${sellerProducts.isEmpty()}" class="products-grid">
+                    <div th:each="product : ${sellerProducts}" class="product-card">
+                        <div class="product-title" th:text="${product.name}">Nome Prodotto</div>
+                        
+                        <div class="product-meta">
+                            <div>
+                                <span class="label">Categoria:</span>
+                                <span class="value" th:text="${product.category.name}">Categoria</span>
+                            </div>
+                            <div>
+                                <span class="label">Valutazione:</span>
+                                <span class="value">
+                                    <span th:if="${product.getAverageRating() > 0}">
+                                        <div th:replace="~{fragments/rating-stars :: rating-stars(${product.getAverageRating()}, ${product.getRatingCount()})}"></div>
+                                    </span>
+                                    <span th:unless="${product.getAverageRating() > 0}">
+                                        Nessuna recensione
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="product-price">
+                            €<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+                        </div>
+                        
+                        <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" class="product-images">
+                            <img th:each="image, iterStat : ${product.images}" 
+                                 th:if="${iterStat.index < 3}"
+                                 th:src="@{'/product/image/' + ${image.id}}" 
+                                 th:alt="${product.name}" />
+                        </div>
+                        
+                        <div class="product-actions">
+                            <a th:href="@{'/product/details/' + ${product.id}}" class="btn btn-primary btn-sm">
+                                👁️ Visualizza
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="seller-sidebar">
+                <div class="seller-about">
+                    <h3><i class="fas fa-info-circle"></i> Info Venditore</h3>
+                    <p>Venditore verificato nella piattaforma di Sitarello.</p>
+                    <p>Specializzato in prodotti di qualità.</p>
+                </div>
+                
+                <div class="contact-seller">
+                    <h3><i class="fas fa-envelope"></i> Contatta il Venditore</h3>
+                    <p>Hai domande sui prodotti o vuoi maggiori informazioni?</p>
+                    <a href="#" class="contact-btn" onclick="contactSeller()">
+                        <i class="fas fa-paper-plane"></i> Invia Messaggio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script th:src="@{/js/seller-profile.js}"></script>
+</body>
+</html>

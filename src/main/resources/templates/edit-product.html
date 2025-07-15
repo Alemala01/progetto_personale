@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifica Prodotto</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/edit-product.css}" />
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    <main class="container">
+        <h1>Modifica Prodotto</h1>
+        <div class="product-details">
+            <h2 th:text="${product.name}">Nome Prodotto</h2>
+            <p><strong>Categoria:</strong> <span th:text="${product.category?.name ?: 'Categoria non specificata'}"></span></p>
+            <p><strong>Descrizione:</strong> <span th:text="${product.description}"></span></p>
+            <p><strong>Prezzo:</strong> <span th:text="${product.price}"></span> €</p>
+            
+            <div class="image-info">
+                <h4>Immagini del prodotto:</h4>
+                <p>Le immagini possono essere modificate nella sezione "Modifica Immagini".</p>
+            </div>
+        </div>
+        
+        <div class="edit-options">
+            <h3>Cosa vuoi modificare?</h3>
+            <div class="button-group">
+                <a th:href="@{'/product/edit/' + ${product.id} + '/details'}" class="button">Modifica Dettagli</a>
+                <a th:href="@{'/product/edit/' + ${product.id} + '/images'}" class="button">Modifica Immagini</a>
+            </div>
+            
+            <div class="danger-zone">
+                <h3>Zona Pericolosa</h3>
+                <form th:action="@{'/product/delete/' + ${product.id}}" method="post" 
+                      onsubmit="return confirm('Sei sicuro di voler eliminare questo prodotto? Questa azione non può essere annullata.');">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="button danger">Elimina Prodotto</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="navigation-buttons">
+            <a th:href="@{/users/products}" class="button secondary">Torna ai Miei Prodotti</a>
+        </div>
+    </main>
+    <!-- Include footer fragment -->    <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>
+
+

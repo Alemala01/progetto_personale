@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrazione Utente</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/register.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    <main class="container">
+        <div class="register-container">
+            <h1 class="register-title">
+                <i class="fas fa-user-plus"></i> Registrazione
+            </h1>
+            
+            <!-- Messaggio di successo -->
+            <div th:if="${successMessage}" class="success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${successMessage}">Messaggio di successo</span>
+            </div>
+            
+            <!-- Messaggio di errore generale -->
+            <div th:if="${errorMessage}" class="error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${errorMessage}">Messaggio di errore</span>
+            </div>
+            
+            <form th:object="${usersDTO}" th:action="@{/users/register}" method="post" id="registerForm">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input type="text" id="username" th:field="*{username}" 
+                           required minlength="3" maxlength="20"
+                           pattern="^[a-zA-Z0-9_]+$"
+                           title="Solo lettere, numeri e underscore (3-20 caratteri)" />
+                    <p th:if="${#fields.hasErrors('username')}" class="error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span th:errors="*{username}"></span>
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" id="email" th:field="*{email}" required />
+                    <p th:if="${#fields.hasErrors('email')}" class="error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span th:errors="*{email}"></span>
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" th:field="*{password}" 
+                           required minlength="8"
+                           pattern="^(?=.*[A-Z])(?=.*[0-9]).*$" />
+                    <div class="password-requirements">
+                        <strong>Requisiti password:</strong>
+                        <ul id="passwordChecks">
+                            <li id="lengthCheck">Almeno 8 caratteri</li>
+                            <li id="upperCheck">Almeno una lettera maiuscola</li>
+                            <li id="numberCheck">Almeno un numero</li>
+                        </ul>
+                    </div>
+                    <p th:if="${#fields.hasErrors('password')}" class="error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span th:errors="*{password}"></span>
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">
+                        <i class="fas fa-lock"></i> Conferma Password
+                    </label>
+                    <input type="password" id="confirmPassword" th:field="*{confirmPassword}" 
+                           required minlength="8" />
+                    <p th:if="${#fields.hasErrors('confirmPassword')}" class="error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span th:errors="*{confirmPassword}"></span>
+                    </p>
+                    <p id="passwordMatchError" class="error" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Le password non coincidono
+                    </p>
+                </div>
+                
+                <button type="submit" class="btn-register" id="submitBtn" disabled>
+                    <i class="fas fa-user-plus"></i> Registrati
+                </button>
+            </form>
+            
+            <p class="login-link">
+                Hai già un account? <a th:href="@{/users/login}">Accedi qui</a>
+            </p>
+        </div>
+    </main>
+    
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script th:src="@{/js/register.js}"></script>
+</body>
+</html>
