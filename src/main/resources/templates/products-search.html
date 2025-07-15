@@ -5,7 +5,7 @@
     <title>Ricerca Prodotti - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/products.css?v=10}" />
-    <link rel="stylesheet" th:href="@{/css/products-search.css?v=6}" />
+    <link rel="stylesheet" th:href="@{/css/products-search-improved.css?v=1}" />
     <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
 </head>
@@ -90,12 +90,18 @@
                             </select>
                         </div>
                         
+                        <div class="filter-pill" data-filter="author">
+                            <span class="pill-icon">👤</span>
+                            <span class="pill-label">Autore</span>
+                            <input type="text" th:field="*{autore}" placeholder="Nome autore" class="pill-input" style="width: 120px;" />
+                        </div>
+                        
                         <div class="filter-pill" data-filter="price">
-                            <span class="pill-icon">💰</span>
-                            <span class="pill-label">Prezzo</span>
-                            <input type="number" th:field="*{prezzoMin}" placeholder="Min" class="pill-input" />
+                            <span class="pill-icon">�</span>
+                            <span class="pill-label">Anno Pubblicazione</span>
+                            <input type="number" th:field="*{annoPubblicazioneMin}" placeholder="Min" class="pill-input" />
                             <span class="pill-separator">-</span>
-                            <input type="number" th:field="*{prezzoMax}" placeholder="Max" class="pill-input" />
+                            <input type="number" th:field="*{annoPubblicazioneMax}" placeholder="Max" class="pill-input" />
                         </div>
                         
                         <div class="filter-pill" data-filter="rating">
@@ -154,15 +160,20 @@
                     <span class="filter-text" th:text="${searchDTO.categoria}"></span>
                     <button class="remove-filter" onclick="removeFilter('categoria')">×</button>
                 </div>
-                <div th:if="${searchDTO.hasPrezzoMin()}" class="active-filter">
-                    <span class="filter-icon">💰</span>
-                    <span class="filter-text" th:text="'Min: €' + ${searchDTO.prezzoMin}"></span>
-                    <button class="remove-filter" onclick="removeFilter('prezzoMin')">×</button>
+                <div th:if="${searchDTO.hasAutore()}" class="active-filter">
+                    <span class="filter-icon">👤</span>
+                    <span class="filter-text" th:text="${searchDTO.autore}"></span>
+                    <button class="remove-filter" onclick="removeFilter('autore')">×</button>
                 </div>
-                <div th:if="${searchDTO.hasPrezzoMax()}" class="active-filter">
-                    <span class="filter-icon">💰</span>
-                    <span class="filter-text" th:text="'Max: €' + ${searchDTO.prezzoMax}"></span>
-                    <button class="remove-filter" onclick="removeFilter('prezzoMax')">×</button>
+                <div th:if="${searchDTO.hasAnnoPubblicazioneMin()}" class="active-filter">
+                    <span class="filter-icon">�</span>
+                    <span class="filter-text" th:text="'Dal: ' + ${searchDTO.annoPubblicazioneMin}"></span>
+                    <button class="remove-filter" onclick="removeFilter('annoPubblicazioneMin')">×</button>
+                </div>
+                <div th:if="${searchDTO.hasAnnoPubblicazioneMax()}" class="active-filter">
+                    <span class="filter-icon">�</span>
+                    <span class="filter-text" th:text="'Al: ' + ${searchDTO.annoPubblicazioneMax}"></span>
+                    <button class="remove-filter" onclick="removeFilter('annoPubblicazioneMax')">×</button>
                 </div>
                 <div th:if="${searchDTO.hasRatingMin()}" class="active-filter">
                     <span class="filter-icon">⭐</span>
@@ -203,7 +214,15 @@
         </section>
         
         <!-- Products Grid -->
-        <div th:if="${totalProducts > 0}" class="products-container list-view" id="productsContainer">
+        <div class="products-container list-view" id="productsContainer">
+            <!-- Debug Info -->
+            <div style="background: rgba(255,0,0,0.3); color: white; padding: 1rem; margin-bottom: 1rem; border-radius: 10px;">
+                <h4>🔍 Debug Info:</h4>
+                <p>Totale prodotti: <span th:text="${totalProducts}">0</span></p>
+                <p>Numero elementi products: <span th:text="${#lists.size(products)}">0</span></p>
+                <p>Products è null: <span th:text="${products == null}">false</span></p>
+            </div>
+            
             <div th:each="product : ${products}" class="product-card modern-card" th:data-product-id="${product.id}">
                 <div class="card-header">
                     <div class="product-badge">
