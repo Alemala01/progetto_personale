@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Tuo Profilo - Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    
+    <main class="container">
+        <h1>Il Tuo Profilo</h1>
+        
+        <div>
+            <h3>Informazioni Personali</h3>
+            <p>Username: <span th:text="${username}">Username</span></p>
+            <p>Email: <span th:text="${user.email}">Email</span></p>
+            <p>Ruolo: <span th:text="${user.role}">Ruolo</span></p>
+        </div>
+        
+        <div>
+            <h3>Impostazioni</h3>
+            <form th:action="@{/users/update-profile}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                
+                <div>
+                    <label>Nome Utente</label>
+                    <input type="text" name="username" th:value="${username}" required />
+                </div>
+                
+                <button type="submit">Salva Modifiche</button>
+            </form>
+        </div>
+    </main>
+    
+    <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>

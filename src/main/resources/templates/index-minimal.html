@@ -247,11 +247,9 @@
                     <a href="/users/profile"><i class="fas fa-user"></i> Profilo</a>
                     <a th:if="${isAdmin}" href="/product/create"><i class="fas fa-plus"></i> Aggiungi Libro</a>
                     <a th:if="${isAdmin}" href="/author/create"><i class="fas fa-user-plus"></i> Aggiungi Autore</a>
-                    <form action="/logout" method="post" style="display: inline;">
-                        <button type="submit" class="btn" style="background: none; border: none; color: #2c3e50; padding: 0.5rem 1rem;">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </form>
+                    <a href="/logout" style="color: #2c3e50; padding: 0.5rem 1rem; text-decoration: none;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
                 </div>
                 <div th:unless="${isAuthenticated}" style="display: flex; gap: 1rem;">
                     <a href="/users/login"><i class="fas fa-sign-in-alt"></i> Accedi</a>
@@ -304,6 +302,11 @@
     </div>
 
     <main class="container">
+        <!-- Messaggio di logout success -->
+        <div th:if="${logoutSuccess}" class="alert alert-success" style="background: #d4edda; color: #155724; padding: 1rem; margin-bottom: 2rem; border-radius: 8px; border: 1px solid #c3e6cb;">
+            <i class="fas fa-check-circle"></i> <span th:text="${logoutSuccess}"></span>
+        </div>
+        
         <!-- Messaggio di benvenuto per utenti autenticati -->
         <div th:if="${isAuthenticated}" class="welcome-section">
             <div class="welcome-card">

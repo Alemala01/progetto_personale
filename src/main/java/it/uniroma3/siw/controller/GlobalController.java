@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import it.uniroma3.siw.model.Author;
@@ -59,9 +60,14 @@ public class GlobalController {
 
     @GetMapping("/")
     @Transactional(readOnly = true)
-    public String index(Model model) {
+    public String index(Model model, @RequestParam(required = false) String logout) {
         try {
             addAuthenticationAttributes(model);
+            
+            // Aggiungi messaggio di logout success se presente
+            if ("success".equals(logout)) {
+                model.addAttribute("logoutSuccess", "Logout effettuato con successo!");
+            }
 
             // Ultimi libri aggiunti (massimo 6) - con gestione errori
             List<Product> latestBooks = new ArrayList<>();
