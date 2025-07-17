@@ -92,6 +92,7 @@ public class RatingService {
         if (existingRatingOpt.isPresent()) {
             // Aggiorna il rating esistente
             rating = existingRatingOpt.get();
+            rating.setTitolo(ratingDTO.getTitolo());
             rating.setValue(ratingDTO.getValue());
             rating.setComment(ratingDTO.getComment());
         } else {
@@ -99,6 +100,7 @@ public class RatingService {
             rating = new Rating();
             rating.setProduct(product);
             rating.setUser(user);
+            rating.setTitolo(ratingDTO.getTitolo());
             rating.setValue(ratingDTO.getValue());
             rating.setComment(ratingDTO.getComment());
         }
@@ -120,6 +122,22 @@ public class RatingService {
             } else {
                 throw new IllegalArgumentException("Non hai i permessi per eliminare questo rating");
             }
+        } else {
+            throw new IllegalArgumentException("Recensione non trovata");
+        }
+    }
+    
+    /**
+     * Elimina un rating come amministratore (può eliminare qualsiasi rating)
+     */
+    @Transactional
+    public void deleteRatingAsAdmin(Long ratingId) {
+        Optional<Rating> ratingOpt = ratingRepository.findById(ratingId);
+        if (ratingOpt.isPresent()) {
+            Rating rating = ratingOpt.get();
+            ratingRepository.delete(rating);
+        } else {
+            throw new IllegalArgumentException("Recensione non trovata");
         }
     }
 }

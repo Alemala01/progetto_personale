@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import it.uniroma3.siw.dto.RatingDTO;
@@ -69,6 +70,14 @@ public class RatingController {
     }
     
     /**
+     * Verifica se l'utente autenticato è un admin
+     */
+    private boolean isAdmin() {
+        Users user = getAuthenticatedUser();
+        return user != null && "ADMIN".equals(user.getRole());
+    }
+    
+    /**
      * Aggiunge attributi di autenticazione al modello
      */
     private void addAuthenticationAttributes(Model model) {
@@ -78,6 +87,7 @@ public class RatingController {
         model.addAttribute("isAuthenticated", isAuthenticated);
         if (isAuthenticated && auth != null) {
             model.addAttribute("username", auth.getName());
+            model.addAttribute("isAdmin", isAdmin());
         }
     }
     
@@ -123,6 +133,7 @@ public class RatingController {
             RatingDTO ratingDTO = new RatingDTO();
             ratingDTO.setProductId(productId);
             if (userRating != null) {
+                ratingDTO.setTitolo(userRating.getTitolo());
                 ratingDTO.setValue(userRating.getValue());
                 ratingDTO.setComment(userRating.getComment());
             }
@@ -140,17 +151,24 @@ public class RatingController {
      * Aggiunge o aggiorna un rating
      */
     @PostMapping("/submit")
-    public String submitRating(@Valid RatingDTO ratingDTO, BindingResult bindingResult, Model model) {
+    public String submitRating(@Valid RatingDTO ratingDTO, 
+                              BindingResult bindingResult, 
+                              @RequestParam("titolo") String titolo,
+                              Model model) {
         addAuthenticationAttributes(model);
+        
+        // Imposta il titolo nel DTO
+        ratingDTO.setTitolo(titolo);
         
         // Verifica se l'utente è autenticato
         Users authenticatedUser = getAuthenticatedUser();
         if (authenticatedUser == null) {
-            model.addAttribute("errorMessage", "Devi essere autenticato per valutare un prodotto.");
+            model.addAttribute("errorMessage", "Devi essere autenticato per recensire un prodotto.");
             return "error";
         }
         
-        logger.info("Submitting rating for product ID: {} with value: {}", ratingDTO.getProductId(), ratingDTO.getValue());
+        logger.info("Submitting rating for product ID: {} with value: {} and title: {}", 
+                   ratingDTO.getProductId(), ratingDTO.getValue(), titolo);
         
         // Verifica se il prodotto esiste
         Optional<Product> productOpt = productRepository.findById(ratingDTO.getProductId());
@@ -163,7 +181,7 @@ public class RatingController {
         
         // Verifica che l'utente non stia valutando un proprio prodotto
         if (product.getSeller() != null && product.getSeller().getId().equals(authenticatedUser.getId())) {
-            model.addAttribute("errorMessage", "Non puoi valutare i tuoi prodotti.");
+            model.addAttribute("errorMessage", "Non puoi recensire i tuoi prodotti.");
             return "error";
         }
         
@@ -178,21 +196,21 @@ public class RatingController {
         }
         
         try {
-            // Salva il rating - questa operazione è transazionale nel service
+            // Salva la recensione - questa operazione è transazionale nel service
             Rating savedRating = ratingService.saveRating(ratingDTO, authenticatedUser);
-            logger.info("Rating saved successfully with ID: {}", savedRating.getId());
+            logger.info("Review saved successfully with ID: {} and title: {}", savedRating.getId(), savedRating.getTitolo());
             
             return "redirect:/product/details/" + product.getId();
         } catch (Exception e) {
-            logger.error("Error submitting rating: {}", e.getMessage(), e);
-            model.addAttribute("errorMessage", "Errore durante l'invio della valutazione: " + e.getMessage());
+            logger.error("Error submitting review: {}", e.getMessage(), e);
+            model.addAttribute("errorMessage", "Errore durante l'invio della recensione: " + e.getMessage());
             model.addAttribute("product", product);
             return "error";
         }
     }
     
     /**
-     * Elimina un rating
+     * Elimina una recensione
      */
     @DeleteMapping("/{ratingId}")
     @ResponseBody
@@ -201,14 +219,22 @@ public class RatingController {
         try {
             Users authenticatedUser = getAuthenticatedUser();
             if (authenticatedUser == null) {
-                return ResponseEntity.status(401).body("Devi essere autenticato per eliminare una valutazione.");
+                return ResponseEntity.status(401).body("Devi essere autenticato per eliminare una recensione.");
             }
             
-            ratingService.deleteRating(ratingId, authenticatedUser);
-            return ResponseEntity.ok("Valutazione eliminata con successo.");
+            // Gli admin possono eliminare qualsiasi recensione
+            if (isAdmin()) {
+                ratingService.deleteRatingAsAdmin(ratingId);
+                logger.info("Review deleted by admin: {} (rating ID: {})", authenticatedUser.getUsername(), ratingId);
+                return ResponseEntity.ok("Recensione eliminata con successo dall'amministratore.");
+            } else {
+                // Gli utenti normali possono eliminare solo le proprie recensioni
+                ratingService.deleteRating(ratingId, authenticatedUser);
+                return ResponseEntity.ok("Recensione eliminata con successo.");
+            }
         } catch (Exception e) {
-            logger.error("Error deleting rating: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body("Errore durante l'eliminazione della valutazione: " + e.getMessage());
+            logger.error("Error deleting review: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body("Errore durante l'eliminazione della recensione: " + e.getMessage());
         }
     }
 }

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name + ' - Recensioni - Sitarello'}">Recensioni del Prodotto - Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/product-ratings.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <main class="container">
+        <div class="ratings-container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a th:href="@{/}">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <span class="separator">/</span>
+                <a th:href="@{/products}">
+                    <i class="fas fa-book-open"></i> Libri
+                </a>
+                <span class="separator">/</span>
+                <a th:href="@{'/product/details/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a>
+                <span class="separator">/</span>
+                <span class="current">Recensioni</span>
+            </nav>
+
+            <!-- Header -->
+            <div class="page-header">
+                <h1>
+                    <i class="fas fa-star"></i>
+                    Recensioni per <span th:text="${product.name}">Nome Prodotto</span>
+                </h1>
+                <a th:href="@{'/product/details/' + ${product.id}}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Torna al Libro
+                </a>
+            </div>
+            
+            <!-- Riepilogo delle recensioni -->
+            <div class="rating-summary">
+                <div class="average-rating">
+                    <div class="rating-value" th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">0.0</div>
+                    <div class="rating-stars">
+                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                            <i th:class="${i <= averageRating} ? 'fas fa-star filled' : 'far fa-star'"></i>
+                        </span>
+                    </div>
+                    <div class="rating-count" th:text="${ratingCount + ' recensioni'}">0 recensioni</div>
+                </div>
+            </div>
+            
+            <!-- Messaggio se l'utente ha già recensito -->
+            <div th:if="${hasUserRated}" class="user-rating-info">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Hai già recensito questo libro. Puoi modificare la tua recensione utilizzando il modulo qui sotto.</p>
+                </div>
+            </div>
+            
+            <!-- Form per aggiungere/modificare recensione (solo per utenti autenticati) -->
+            <div th:if="${isAuthenticated and (product.seller == null or product.seller.username != username)}" class="rating-form">
+                <h2 class="form-title">
+                    <i class="fas fa-edit"></i>
+                    <span th:text="${hasUserRated ? 'Modifica la tua recensione' : 'Scrivi una recensione'}">Scrivi una recensione</span>
+                </h2>
+                
+                <form th:action="@{/ratings/submit}" method="post" th:object="${ratingDTO}" class="review-form">
+                    <input type="hidden" name="productId" th:value="${product.id}" />
+                    
+                    <!-- Campo Titolo -->
+                    <div class="form-group">
+                        <label class="form-label" for="titolo">
+                            <i class="fas fa-heading"></i>
+                            Titolo della recensione *
+                        </label>
+                        <input type="text" 
+                               id="titolo" 
+                               name="titolo"
+                               th:value="${userRating != null ? userRating.titolo : ''}"
+                               class="form-input"
+                               placeholder="Dai un titolo alla tua recensione..."
+                               maxlength="100"
+                               required>
+                        <div class="form-help">Massimo 100 caratteri</div>
+                    </div>
+                    
+                    <!-- Campo Voto -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-star"></i>
+                            Il tuo voto *
+                        </label>
+                        <div class="star-rating">
+                            <input type="radio" th:field="*{value}" id="star5" value="5" />
+                            <label for="star5" class="star" title="Eccellente">
+                                <i class="fas fa-star"></i>
+                            </label>
+                            
+                            <input type="radio" th:field="*{value}" id="star4" value="4" />
+                            <label for="star4" class="star" title="Molto buono">
+                                <i class="fas fa-star"></i>
+                            </label>
+                            
+                            <input type="radio" th:field="*{value}" id="star3" value="3" />
+                            <label for="star3" class="star" title="Buono">
+                                <i class="fas fa-star"></i>
+                            </label>
+                            
+                            <input type="radio" th:field="*{value}" id="star2" value="2" />
+                            <label for="star2" class="star" title="Sufficiente">
+                                <i class="fas fa-star"></i>
+                            </label>
+                            
+                            <input type="radio" th:field="*{value}" id="star1" value="1" />
+                            <label for="star1" class="star" title="Scarso">
+                                <i class="fas fa-star"></i>
+                            </label>
+                        </div>
+                        <div class="rating-description" id="rating-description">Seleziona una valutazione</div>
+                        <div class="error-message" th:if="${#fields.hasErrors('value')}" th:errors="*{value}">Errore</div>
+                    </div>
+                    
+                    <!-- Campo Commento -->
+                    <div class="form-group">
+                        <label class="form-label" for="comment">
+                            <i class="fas fa-comment"></i>
+                            La tua recensione *
+                        </label>
+                        <textarea th:field="*{comment}" 
+                                  id="comment" 
+                                  class="form-textarea"
+                                  rows="6" 
+                                  placeholder="Condividi la tua opinione dettagliata su questo libro..."
+                                  maxlength="1000"
+                                  required></textarea>
+                        <div class="form-help">
+                            <span id="char-count">0</span>/1000 caratteri
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        <span th:text="${hasUserRated ? 'Aggiorna recensione' : 'Pubblica recensione'}">Pubblica recensione</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Messaggio per il venditore del prodotto -->
+            <div th:if="${isAuthenticated and product.seller != null and product.seller.username == username}" class="seller-info">
+                <div class="alert alert-warning">
+                    <i class="fas fa-store"></i>
+                    <div>
+                        <h3>Il tuo libro</h3>
+                        <p>Non puoi recensire i tuoi libri. Questa pagina ti mostra tutte le recensioni ricevute dai tuoi lettori.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Messaggio per utenti non autenticati -->
+            <div th:unless="${isAuthenticated}" class="auth-prompt">
+                <div class="alert alert-info">
+                    <i class="fas fa-user-plus"></i>
+                    <div>
+                        <h3>Vuoi lasciare una recensione?</h3>
+                        <p>Per lasciare una recensione e aiutare altri lettori nella scelta, accedi al tuo account o registrati gratuitamente.</p>
+                        <div class="auth-buttons">
+                            <a th:href="@{/users/login}" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> Accedi
+                            </a>
+                            <a th:href="@{/users/register}" class="btn btn-success">
+                                <i class="fas fa-user-plus"></i> Registrati
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lista delle recensioni -->
+            <div class="ratings-list">
+                <h2 class="ratings-title">
+                    <i class="fas fa-comments"></i>
+                    Tutte le recensioni
+                    <span class="count" th:text="'(' + ${ratingCount} + ')'">(0)</span>
+                </h2>
+                
+                <div th:if="${#lists.isEmpty(ratings)}" class="no-ratings">
+                    <div class="empty-state">
+                        <i class="fas fa-star-o"></i>
+                        <h3>Nessuna recensione ancora</h3>
+                        <p>Sii il primo a recensire questo libro!</p>
+                        <a th:if="${isAuthenticated and (product.seller == null or product.seller.username != username)}" 
+                           href="#" 
+                           onclick="document.querySelector('.rating-form').scrollIntoView({behavior: 'smooth'}); return false;"
+                           class="btn btn-primary">
+                            <i class="fas fa-star"></i> Scrivi la prima recensione
+                        </a>
+                    </div>
+                </div>
+                
+                <div th:each="rating : ${ratings}" class="rating-item">
+                    <div class="rating-header">
+                        <div class="user-info">
+                            <div class="avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-details">
+                                <span class="username" th:text="${rating.user.username}">username</span>
+                                <div class="rating-stars">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <i th:class="${i <= rating.value} ? 'fas fa-star filled' : 'far fa-star'"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rating-date" th:text="${#temporals.format(rating.createdAt, 'dd/MM/yyyy')}">01/01/2025</div>
+                    </div>
+                    
+                    <!-- Titolo recensione -->
+                    <h3 class="review-title" th:if="${rating.titolo != null and not #strings.isEmpty(rating.titolo)}" th:text="${rating.titolo}">
+                        Titolo della recensione
+                    </h3>
+                    
+                    <!-- Contenuto recensione -->
+                    <div class="rating-content" th:if="${rating.comment != null and not #strings.isEmpty(rating.comment)}" th:text="${rating.comment}">
+                        Contenuto della recensione...
+                    </div>
+                    
+                    <!-- Azioni recensione -->
+                    <div class="rating-actions" th:if="${isAuthenticated and (username == rating.user.username or isAdmin)}">
+                        <button th:attr="onclick=|deleteRating(${rating.id})|" 
+                                class="btn-delete"
+                                th:classappend="${isAdmin and username != rating.user.username} ? 'admin-delete' : ''">
+                            <i class="fas fa-trash"></i> 
+                            <span th:text="${isAdmin and username != rating.user.username} ? 'Elimina (Admin)' : 'Elimina'">Elimina</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script>
+        // Rating system functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeRatingSystem();
+            initializeCharacterCounter();
+            initializeFormValidation();
+            preselectUserRating();
+        });
+
+        function initializeRatingSystem() {
+            const ratingInputs = document.querySelectorAll('input[name="value"]');
+            const ratingDescription = document.getElementById('rating-description');
+            
+            const descriptions = {
+                1: 'Scarso - Non lo consiglio',
+                2: 'Sufficiente - Poteva essere meglio',
+                3: 'Buono - Mi è piaciuto',
+                4: 'Molto buono - Lo consiglio',
+                5: 'Eccellente - Assolutamente da leggere!'
+            };
+            
+            ratingInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const rating = this.value;
+                    ratingDescription.textContent = descriptions[rating] || 'Seleziona una valutazione';
+                    ratingDescription.style.color = rating ? '#f59e0b' : '#94a3b8';
+                });
+            });
+        }
+
+        function initializeCharacterCounter() {
+            const textarea = document.getElementById('comment');
+            const charCount = document.getElementById('char-count');
+            
+            if (textarea && charCount) {
+                function updateCount() {
+                    charCount.textContent = textarea.value.length;
+                }
+                
+                textarea.addEventListener('input', updateCount);
+                updateCount(); // Initial count
+            }
+        }
+
+        function initializeFormValidation() {
+            const form = document.querySelector('.review-form');
+            
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    let isValid = true;
+                    
+                    // Validate title
+                    const titleInput = document.getElementById('titolo');
+                    if (!titleInput.value.trim()) {
+                        alert('Il titolo è obbligatorio');
+                        isValid = false;
+                    }
+                    
+                    // Validate rating
+                    const ratingInputs = document.querySelectorAll('input[name="value"]');
+                    const ratingSelected = Array.from(ratingInputs).some(input => input.checked);
+                    if (!ratingSelected) {
+                        alert('Seleziona una valutazione');
+                        isValid = false;
+                    }
+                    
+                    // Validate comment
+                    const commentTextarea = document.getElementById('comment');
+                    if (!commentTextarea.value.trim()) {
+                        alert('La recensione è obbligatoria');
+                        isValid = false;
+                    }
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        }
+
+        function preselectUserRating() {
+            const userRatingValue = /*[[${userRating != null ? userRating.value : null}]]*/ null;
+            if (userRatingValue) {
+                const radioInput = document.querySelector(`input[name="value"][value="${userRatingValue}"]`);
+                if (radioInput) {
+                    radioInput.checked = true;
+                    radioInput.dispatchEvent(new Event('change'));
+                }
+            }
+        }
+        
+        // Funzione per eliminare una recensione
+        function deleteRating(ratingId) {
+            // Determina se l'utente è admin guardando se il pulsante contiene "(Admin)"
+            const deleteButton = document.querySelector(`button[onclick*="${ratingId}"]`);
+            const isAdminDeleting = deleteButton && deleteButton.textContent.includes('(Admin)');
+            
+            const confirmMessage = isAdminDeleting 
+                ? 'Sei sicuro di voler eliminare questa recensione come amministratore?' 
+                : 'Sei sicuro di voler eliminare questa recensione?';
+                
+            if (confirm(confirmMessage)) {
+                fetch(`/ratings/${ratingId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
+                })
+                .catch(error => {
+                    alert('Errore durante l\'eliminazione della recensione: ' + error.message);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

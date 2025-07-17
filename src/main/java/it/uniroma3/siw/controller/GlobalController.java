@@ -62,6 +62,7 @@ public class GlobalController {
     @Transactional(readOnly = true)
     public String index(Model model, @RequestParam(required = false) String logout) {
         try {
+            logger.info("Loading homepage...");
             addAuthenticationAttributes(model);
             
             // Aggiungi messaggio di logout success se presente
@@ -69,70 +70,65 @@ public class GlobalController {
                 model.addAttribute("logoutSuccess", "Logout effettuato con successo!");
             }
 
-            // Ultimi libri aggiunti (massimo 6) - con gestione errori
+            // Inizializzazione con valori di default
             List<Product> latestBooks = new ArrayList<>();
-            try {
-                // Prima proviamo a prendere tutti i libri
-                List<Product> allBooks = productRepository.findAll();
-                logger.info("Found {} total books in database", allBooks.size());
-                
-                if (allBooks != null && !allBooks.isEmpty()) {
-                    // Prendiamo solo i primi 6 per la homepage
-                    latestBooks = allBooks.stream()
-                        .limit(6)
-                        .collect(java.util.stream.Collectors.toList());
-                }
-                
-                logger.info("Selected {} books for homepage", latestBooks.size());
-                
-                // Log dei primi libri per debug
-                for (int i = 0; i < Math.min(3, latestBooks.size()); i++) {
-                    Product book = latestBooks.get(i);
-                    logger.info("Book {}: ID={}, Name='{}', CreatedAt={}", 
-                        i+1, book.getId(), book.getName(), book.getCreatedAt());
-                }
-            } catch (Exception e) {
-                logger.error("Errore nel caricamento dei libri recenti: {}", e.getMessage(), e);
-                latestBooks = new ArrayList<>();
-            }
-
-            // Autori più popolari (con più libri) - con gestione errori
-            List<Author> popularAuthors = new ArrayList<>();
-            try {
-                popularAuthors = authorRepository.findTop6ByOrderByNomeAsc();
-                if (popularAuthors == null) {
-                    popularAuthors = new ArrayList<>();
-                }
-            } catch (Exception e) {
-                logger.warn("Errore nel caricamento degli autori: {}", e.getMessage());
-                popularAuthors = new ArrayList<>();
-            }
-
-            // Categorie disponibili - con gestione errori
+            List<Author> popularAuthors = new ArrayList<>(); 
             List<Category> categories = new ArrayList<>();
-            try {
-                categories = categoryRepository.findAll();
-                if (categories == null) {
-                    categories = new ArrayList<>();
-                }
-            } catch (Exception e) {
-                logger.warn("Errore nel caricamento delle categorie: {}", e.getMessage());
-                categories = new ArrayList<>();
-            }
-
-            // Statistiche generali - con gestione errori
             long totalBooks = 0;
             long totalAuthors = 0;
             long totalCategories = 0;
-            
+
+            // Caricamento dati dal database con gestione errori
             try {
+                logger.info("Attempting to load data from database...");
+                
+                // Prima carica le statistiche
                 totalBooks = productRepository.count();
                 totalAuthors = authorRepository.count();
                 totalCategories = categoryRepository.count();
+                
+                logger.info("Database stats: {} books, {} authors, {} categories", 
+                           totalBooks, totalAuthors, totalCategories);
+                
+                // Carica i libri più recenti (massimo 6)
+                if (totalBooks > 0) {
+                    List<Product> allBooks = productRepository.findAll();
+                    latestBooks = allBooks.stream()
+                        .limit(6)
+                        .collect(java.util.stream.Collectors.toList());
+                    logger.info("Loaded {} books for homepage", latestBooks.size());
+                }
+                
+                // Carica gli autori (massimo 6)
+                if (totalAuthors > 0) {
+                    popularAuthors = authorRepository.findTop6ByOrderByNomeAsc();
+                    if (popularAuthors == null) {
+                        popularAuthors = new ArrayList<>();
+                    }
+                    logger.info("Loaded {} authors for homepage", popularAuthors.size());
+                }
+                
+                // Carica tutte le categorie
+                if (totalCategories > 0) {
+                    categories = categoryRepository.findAll();
+                    if (categories == null) {
+                        categories = new ArrayList<>();
+                    }
+                    logger.info("Loaded {} categories for homepage", categories.size());
+                }
+                
             } catch (Exception e) {
-                logger.warn("Errore nel caricamento delle statistiche: {}", e.getMessage());
+                logger.error("Database error during homepage loading: {}", e.getMessage(), e);
+                // Mantieni i valori di default in caso di errore
+                totalBooks = 0;
+                totalAuthors = 0;
+                totalCategories = 0;
+                latestBooks = new ArrayList<>();
+                popularAuthors = new ArrayList<>();
+                categories = new ArrayList<>();
             }
 
+            // Aggiungi tutti gli attributi al modello
             model.addAttribute("latestBooks", latestBooks);
             model.addAttribute("popularAuthors", popularAuthors);
             model.addAttribute("categories", categories);
@@ -140,14 +136,14 @@ public class GlobalController {
             model.addAttribute("totalAuthors", totalAuthors);
             model.addAttribute("totalCategories", totalCategories);
 
-            logger.debug("Homepage loaded with {} books, {} authors, {} categories", 
-                        latestBooks.size(), popularAuthors.size(), categories.size());
+            logger.info("Homepage model prepared: {} books, {} authors, {} categories", 
+                       latestBooks.size(), popularAuthors.size(), categories.size());
 
-            return "index";  // Return the main index template
+            return "index";
 
         } catch (Exception e) {
-            logger.error("Error loading homepage: {}", e.getMessage(), e);
-            model.addAttribute("errorMessage", "Errore durante il caricamento della homepage.");
+            logger.error("Critical error loading homepage: {}", e.getMessage(), e);
+            model.addAttribute("errorMessage", "Errore durante il caricamento della homepage: " + e.getMessage());
             return "error";
         }
     }
@@ -294,6 +290,58 @@ public class GlobalController {
         } catch (Exception e) {
             logger.error("Error loading test page: {}", e.getMessage(), e);
             return "error";
+        }
+    }
+
+    @GetMapping("/test-data")
+    @ResponseBody
+    public String testData() {
+        try {
+            StringBuilder result = new StringBuilder();
+            result.append("=== TEST DATA LOADING ===\n");
+            
+            // Test products
+            List<Product> allProducts = productRepository.findAll();
+            result.append("Total products: ").append(allProducts.size()).append("\n");
+            
+            if (!allProducts.isEmpty()) {
+                result.append("First 3 products:\n");
+                for (int i = 0; i < Math.min(3, allProducts.size()); i++) {
+                    Product p = allProducts.get(i);
+                    result.append("- ").append(p.getName())
+                          .append(" (ID: ").append(p.getId()).append(")")
+                          .append(" - Authors: ");
+                    
+                    if (p.getAutori() != null && !p.getAutori().isEmpty()) {
+                        for (Author a : p.getAutori()) {
+                            result.append(a.getNome()).append(" ").append(a.getCognome()).append(", ");
+                        }
+                    } else {
+                        result.append("No authors");
+                    }
+                    result.append("\n");
+                }
+            }
+            
+            // Test authors
+            List<Author> allAuthors = authorRepository.findAll();
+            result.append("\nTotal authors: ").append(allAuthors.size()).append("\n");
+            
+            if (!allAuthors.isEmpty()) {
+                result.append("Authors:\n");
+                for (Author a : allAuthors) {
+                    result.append("- ").append(a.getNome()).append(" ").append(a.getCognome()).append("\n");
+                }
+            }
+            
+            // Test the specific method used in homepage
+            List<Author> top6Authors = authorRepository.findTop6ByOrderByNomeAsc();
+            result.append("\nTop 6 authors (homepage method): ").append(top6Authors != null ? top6Authors.size() : "null").append("\n");
+            
+            return result.toString();
+            
+        } catch (Exception e) {
+            return "ERROR: " + e.getMessage() + "\n" + java.util.Arrays.toString(e.getStackTrace());
         }
     }
 }

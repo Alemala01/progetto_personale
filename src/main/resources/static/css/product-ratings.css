@@ -674,6 +674,33 @@ textarea::placeholder {
     box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
 }
 
+/* Stile speciale per eliminazione admin */
+.btn-delete.admin-delete {
+    background: linear-gradient(135deg, #ff6b35 0%, #e55039 100%);
+    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-delete.admin-delete:hover {
+    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-delete.admin-delete::after {
+    content: '👑';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 12px;
+    background: #ffc107;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Enhanced Stars */
 .star.filled {
     color: #ffc107;
