@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Prodotti Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: white;
+        }
+        .debug { 
+            background: #ff4444; 
+            color: white; 
+            padding: 15px; 
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .product { 
+            border: 2px solid #333; 
+            margin: 15px 0; 
+            padding: 15px; 
+            background: #f9f9f9;
+        }
+        .product h3 {
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        .price {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Catalogo Prodotti - Debug Mode</h1>
+    
+    <div class="debug">
+        <h3>Informazioni Debug</h3>
+        <p>Totale prodotti: <span th:text="${totalProducts}">0</span></p>
+        <p>Dimensione lista: <span th:text="${products.size()}">0</span></p>
+    </div>
+    
+    <div th:if="${products.empty}" style="background: #ffeaa7; padding: 20px; text-align: center;">
+        <h2>Nessun prodotto trovato</h2>
+        <p>La lista dei prodotti è vuota</p>
+    </div>
+    
+    <div th:unless="${products.empty}">
+        <h2>Prodotti Trovati:</h2>
+        
+        <div th:each="product : ${products}" class="product">
+            <h3 th:text="${product.name}">Nome Prodotto</h3>
+            <p>ID: <span th:text="${product.id}">0</span></p>
+            <p class="price">Prezzo: €<span th:text="${product.price}">0.00</span></p>
+            <p>Descrizione: <span th:text="${product.description}">Nessuna descrizione</span></p>
+            <p>Venditore: <span th:text="${product.seller.username}">N/A</span></p>
+            <p>Categoria: <span th:text="${product.category.name}">N/A</span></p>
+            <hr>
+        </div>
+    </div>
+    
+    <div style="margin-top: 30px; padding: 15px; background: #ddd;">
+        <p><a href="/products">Ricarica Pagina</a></p>
+    </div>
+</body>
+</html>

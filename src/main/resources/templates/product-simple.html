@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' - Dettagli Prodotto'">Dettagli Prodotto</title>
+    <!-- Solo CSS di base, niente products.css -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .simple-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        .simple-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+        .simple-title {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .simple-info {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0.5rem 0;
+            display: flex;
+            gap: 1rem;
+        }
+        .simple-label {
+            font-weight: 600;
+            color: #4fc3f7;
+        }
+        .simple-btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: #4fc3f7;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .simple-btn:hover {
+            background: #29b6f6;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; font-family: 'Arial', sans-serif;">
+    
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    
+    <div class="simple-container">
+        <h1 class="simple-title">
+            <i class="fas fa-book"></i>
+            <span th:text="${product.name}">Nome Prodotto</span>
+        </h1>
+        
+        <div class="simple-card">
+            <!-- Informazioni di base -->
+            <div class="simple-info" th:if="${product.category != null}">
+                <span class="simple-label"><i class="fas fa-tag"></i> Categoria:</span>
+                <span th:text="${product.category.name}">Categoria</span>
+            </div>
+            
+            <div class="simple-info" th:if="${product.autori != null and not #lists.isEmpty(product.autori)}">
+                <span class="simple-label"><i class="fas fa-feather-alt"></i> Autore:</span>
+                <span>
+                    <span th:each="author, iterStat : ${product.autori}">
+                        <span th:text="${author.nome + ' ' + author.cognome}">Autore</span>
+                        <span th:if="${!iterStat.last}">, </span>
+                    </span>
+                </span>
+            </div>
+            
+            <div class="simple-info" th:if="${product.annoPubblicazione != null}">
+                <span class="simple-label"><i class="fas fa-calendar-alt"></i> Anno:</span>
+                <span th:text="${product.annoPubblicazione}">Anno</span>
+            </div>
+            
+            <div class="simple-info">
+                <span class="simple-label"><i class="fas fa-user"></i> Venditore:</span>
+                <a th:href="@{/users/seller/{username}(username=${product.seller.username})}" 
+                   th:text="${product.seller.username}" 
+                   style="color: #4fc3f7; text-decoration: none;">Nome Venditore</a>
+            </div>
+            
+            <div style="margin: 2rem 0;">
+                <div class="simple-label" style="margin-bottom: 1rem;">
+                    <i class="fas fa-align-left"></i> Descrizione:
+                </div>
+                <p th:text="${product.description}" style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">Descrizione del prodotto</p>
+            </div>
+            
+            <!-- Immagine se disponibile -->
+            <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" style="margin: 2rem 0; text-align: center;">
+                <div class="simple-label" style="margin-bottom: 1rem;">
+                    <i class="fas fa-image"></i> Immagine:
+                </div>
+                <img th:src="@{/product/image/{imageId}(imageId=${product.images[0].id})}" 
+                     th:alt="${product.name}"
+                     style="max-width: 300px; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);" />
+            </div>
+            
+            <div style="margin-top: 2rem; text-align: center;">
+                <a th:href="@{/products}" class="simple-btn">
+                    <i class="fas fa-arrow-left"></i> Torna ai Prodotti
+                </a>
+                
+                <a th:if="${isAuthenticated and product.seller.username == username}" 
+                   th:href="@{/product/edit/{id}(id=${product.id})}" 
+                   class="simple-btn" style="background: #ff7043;">
+                    <i class="fas fa-edit"></i> Modifica
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -114,19 +114,33 @@ public class ProductController {
     @Transactional(readOnly = true)
     public String showProduct(@PathVariable Long id, Model model) {
         try {
+            logger.info("=== STARTING showProduct for ID: {} ===", id);
+            
             addAuthenticationAttributes(model);
-            Optional<Product> productOpt = productRepository.findByIdWithImages(id);
+            logger.info("Authentication attributes added");
+            
+            Optional<Product> productOpt = productRepository.findById(id);
+            logger.info("Repository query executed, product found: {}", productOpt.isPresent());
+            
             if (productOpt.isEmpty()) {
+                logger.warn("Product with ID {} not found", id);
                 model.addAttribute("errorMessage", "Prodotto non trovato.");
                 return "error";
             }
-            model.addAttribute("product", productOpt.get());
-            logger.debug("Displaying product with ID: {}", id);
-            return "product-view";
+            
+            Product product = productOpt.get();
+            logger.info("Product loaded: name={}, id={}", product.getName(), product.getId());
+            
+            model.addAttribute("product", product);
+            logger.info("Product added to model");
+            
+            logger.info("Returning template: product-minimal");
+            return "product-minimal";
         } catch (Exception e) {
+            logger.error("=== ERROR in showProduct ===", e);
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            logger.error("Error loading product: {}", sw.toString());
+            logger.error("Full stack trace: {}", sw.toString());
             model.addAttribute("errorMessage", "Errore durante il caricamento del prodotto: " + e.getMessage());
             return "error";
         }

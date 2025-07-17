@@ -23,7 +23,6 @@
             <h2 th:text="${product.name}">Nome Prodotto</h2>
             <p><strong>Categoria:</strong> <span th:text="${product.category?.name ?: 'Categoria non specificata'}"></span></p>
             <p><strong>Descrizione:</strong> <span th:text="${product.description}"></span></p>
-            <p><strong>Prezzo:</strong> <span th:text="${product.price}"></span> €</p>
             
             <div class="image-info">
                 <h4>Immagini del prodotto:</h4>

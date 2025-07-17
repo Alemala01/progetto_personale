@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Prodotti - Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug { background: red; color: white; padding: 10px; }
+        .product { border: 1px solid #ccc; margin: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Catalogo Prodotti</h1>
+    
+    <div class="debug">
+        <p>Totale prodotti: <span th:text="${totalProducts}">0</span></p>
+        <p>Lista size: <span th:text="${#lists.size(products)}">0</span></p>
+    </div>
+    
+    <div th:each="product : ${products}" class="product">
+        <h3 th:text="${product.name}">Nome</h3>
+        <p>Prezzo: €<span th:text="${product.price}">0</span></p>
+        <p th:text="${product.description}">Descrizione</p>
+        <p>Venditore: <span th:text="${product.seller.username}">User</span></p>
+    </div>
+    
+    <div th:if="${#lists.isEmpty(products)}">
+        <p>Nessun prodotto trovato</p>
+    </div>
+</body>
+</html>

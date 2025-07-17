@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elenco Prodotti - Sitarello</title>
+    <title th:text="${product.name} + ' - Dettagli Prodotto'">Dettagli Prodotto</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/products.css?v=13}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
@@ -11,7 +11,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <meta name="description" content="Scopri tutti i prodotti disponibili su Sitarello">
 </head>
 <body class="products-page">
     <!-- Animated Background -->
@@ -30,23 +29,21 @@
         <div class="page-header">
             <div class="header-content">
                 <h1 class="page-title">
-                    <i class="fas fa-box-open"></i>
-                    Tutti i Prodotti
+                    <i class="fas fa-eye"></i>
+                    <span th:text="${product.name}">Nome Prodotto</span>
                 </h1>
-                <p class="page-subtitle">Scopri la nostra selezione completa di prodotti di qualità</p>
+                <p class="page-subtitle">Dettagli del prodotto selezionato</p>
             </div>
         </div>
         
-        <!-- Products Grid -->
-        <div th:if="${products != null && !products.isEmpty()}" class="products-grid">
-            <div th:each="product : ${products}" class="product-card">
+        <!-- Single Product Card -->
+        <div class="products-grid" style="grid-template-columns: 1fr; max-width: 900px; margin: 0 auto;">
+            <div class="product-card">
                 <!-- Product Image -->
                 <div class="product-image">
                     <div th:if="${product.images != null && !product.images.isEmpty()}" 
-                         th:class="${'product-image-grid ' + (product.images.size() == 1 ? ' single' : (product.images.size() == 3 ? ' three' : (product.images.size() >= 4 ? ' four' : '')))}">
-                        <img th:each="image, iterStat : ${product.images}" 
-                             th:if="${iterStat.index < 4}"
-                             th:src="@{'/product/image/' + ${image.id}}" 
+                         class="product-image-grid single">
+                        <img th:src="@{/product/image/{imageId}(imageId=${product.images[0].id})}" 
                              th:alt="${product.name}" />
                     </div>
                     <div th:unless="${product.images != null && !product.images.isEmpty()}" class="product-image-placeholder">
@@ -58,6 +55,7 @@
                 <div class="product-content">
                     <div class="product-header">
                         <h2 class="product-name" th:text="${product.name}">Nome Prodotto</h2>
+                        <div class="product-price">€<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span></div>
                     </div>
                     
                     <div class="product-meta">
@@ -96,7 +94,12 @@
                         </div>
                     </div>
                     
-                    <p class="product-description" th:text="${product.description}">Descrizione del prodotto</p>
+                    <div class="product-description-section" style="flex-grow: 1; margin: 1.5rem 0;">
+                        <h3 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-align-left"></i> Descrizione
+                        </h3>
+                        <p th:text="${product.description}" style="color: rgba(255, 255, 255, 0.9); line-height: 1.6; margin: 0;">Descrizione del prodotto</p>
+                    </div>
                     
                     <div class="product-seller">
                         <i class="fas fa-user"></i>
@@ -107,50 +110,19 @@
                     </div>
                     
                     <div class="product-actions">
-                        <a th:href="@{/product/details/{id}(id=${product.id})}" class="btn btn-primary">
-                            <i class="fas fa-eye"></i> Visualizza
+                        <a th:href="@{/products}" class="btn btn-outline">
+                            <i class="fas fa-arrow-left"></i> Torna ai Prodotti
                         </a>
                         
                         <!-- Pulsante di modifica solo se l'utente è autenticato e proprietario del prodotto -->
                         <a th:if="${isAuthenticated and product.seller.username == username}" 
                            th:href="@{/product/edit/{id}(id=${product.id})}" 
-                           class="btn btn-outline">
+                           class="btn btn-primary">
                             <i class="fas fa-edit"></i> Modifica
                         </a>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Enhanced Empty State -->
-        <div th:if="${products == null || products.isEmpty()}" class="empty-state">
-            <div class="empty-icon">
-                <i class="fas fa-box-open"></i>
-            </div>
-            <h3>Nessun prodotto disponibile</h3>
-            <p>Al momento non ci sono prodotti disponibili. Torna più tardi per scoprire le novità!</p>
-            <div class="empty-actions">
-                <a th:href="@{/}" class="btn btn-primary">
-                    <i class="fas fa-home"></i> 
-                    Torna alla Home
-                </a>
-                <a th:href="@{/product/create}" class="btn btn-secondary" sec:authorize="isAuthenticated()">
-                    <i class="fas fa-plus"></i> 
-                    Aggiungi Prodotto
-                </a>
-            </div>
-        </div>
-        
-        <!-- Enhanced Back to Home Button -->
-        <div th:if="${products != null && !products.isEmpty()}" class="page-actions">
-            <a th:href="@{/}" class="btn btn-outline">
-                <i class="fas fa-arrow-left"></i> 
-                Torna alla Home
-            </a>
-            <a th:href="@{/product/create}" class="btn btn-primary" sec:authorize="isAuthenticated()">
-                <i class="fas fa-plus"></i> 
-                Aggiungi Prodotto
-            </a>
         </div>
     </main>
     

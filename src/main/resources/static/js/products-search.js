@@ -640,11 +640,17 @@ function loadQuickViewContent(productId) {
  */
 function initializeProductCards() {
     const productCards = document.querySelectorAll('.product-card');
+    console.log('Found product cards:', productCards.length);
     
     productCards.forEach((card, index) => {
-        // Initial state
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
+        console.log('Processing card', index, card);
+        // Forza la visibilità di tutte le card
+        card.style.opacity = '1';
+        card.style.visibility = 'visible';
+        card.style.display = 'flex';
+        card.style.transform = 'translateY(0)';
+        card.style.position = 'relative';
+        card.style.zIndex = '1';
         
         // Add enhanced hover effects
         card.addEventListener('mouseenter', function() {
@@ -664,13 +670,18 @@ function initializeProductCards() {
  */
 function animateProductCards() {
     const productCards = document.querySelectorAll('.product-card');
+    console.log('Animating product cards:', productCards.length);
     
     productCards.forEach((card, index) => {
-        setTimeout(() => {
-            card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * CONFIG.STAGGER_DELAY);
+        console.log('Animating card', index);
+        // Assicuriamoci che la card sia sempre visibile
+        card.style.opacity = '1';
+        card.style.visibility = 'visible';
+        card.style.display = 'flex';
+        card.style.transform = 'translateY(0)';
+        card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        card.style.position = 'relative';
+        card.style.zIndex = '1';
     });
 }
 

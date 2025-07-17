@@ -5,7 +5,7 @@
     <title>Ricerca Prodotti - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/products.css?v=10}" />
-    <link rel="stylesheet" th:href="@{/css/products-search-improved.css?v=1}" />
+    <link rel="stylesheet" th:href="@{/css/products-search-improved.css?v=7}" />
     <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
 </head>
@@ -121,8 +121,8 @@
                             <select th:field="*{sortBy}" class="pill-select">
                                 <option value="id">Più recenti</option>
                                 <option value="name">Nome A-Z</option>
-                                <option value="price">Prezzo ↑</option>
-                                <option value="price_desc">Prezzo ↓</option>
+                                <option value="anno">Anno ↑</option>
+                                <option value="anno_desc">Anno ↓</option>
                                 <option value="rating">Top rating</option>
                             </select>
                         </div>
@@ -214,91 +214,64 @@
         </section>
         
         <!-- Products Grid -->
-        <div class="products-container list-view" id="productsContainer">
-            <!-- Debug Info -->
-            <div style="background: rgba(255,0,0,0.3); color: white; padding: 1rem; margin-bottom: 1rem; border-radius: 10px;">
-                <h4>🔍 Debug Info:</h4>
-                <p>Totale prodotti: <span th:text="${totalProducts}">0</span></p>
-                <p>Numero elementi products: <span th:text="${#lists.size(products)}">0</span></p>
-                <p>Products è null: <span th:text="${products == null}">false</span></p>
-            </div>
+        <div class="products-container grid-view" id="productsContainer">
             
             <div th:each="product : ${products}" class="product-card modern-card" th:data-product-id="${product.id}">
-                <div class="card-header">
-                    <div class="product-badge">
-                        <span class="badge-icon">🏷️</span>
-                        <span class="badge-text" th:text="${product.category.name}">Categoria</span>
-                    </div>
-                    <div class="product-rating">
-                        <div th:replace="~{fragments/rating-stars :: rating-stars(${product.getAverageRating()}, ${product.getRatingCount()})}"></div>
-                    </div>
-                </div>
-
-                <div class="card-image-section">
-                    <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" class="product-gallery">
-                        <div class="main-image">
-                            <img th:src="@{'/product/image/' + ${product.images[0].id}}" 
-                                 th:alt="${product.name}" 
-                                 class="featured-image" />
+                <div class="book-card-content">
+                    <!-- Book Image Section -->
+                    <div class="book-image-section">
+                        <div class="book-cover">
+                            <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" class="book-image-container">
+                                <img th:src="@{/product/image/{imageId}(imageId=${product.images[0].id})}" 
+                                     th:alt="${product.name}" 
+                                     class="book-cover-image" />
+                                <div class="image-overlay">
+                                    <span class="view-icon">Visualizza</span>
+                                </div>
+                            </div>
+                            <div th:unless="${product.images != null and not #lists.isEmpty(product.images)}" class="book-placeholder">
+                                <span class="placeholder-text">Copertina non disponibile</span>
+                            </div>
                         </div>
-                        <div th:if="${#lists.size(product.images) > 1}" class="image-thumbnails">
-                            <img th:each="image, iterStat : ${product.images}" 
-                                 th:if="${iterStat.index < 4}"
-                                 th:src="@{'/product/image/' + ${image.id}}" 
-                                 th:alt="${product.name}" 
-                                 class="thumbnail-image"
-                                 th:onclick="'switchImage(this.src, &quot;' + ${product.id} + '&quot;)'" />
+                        
+                        <div class="book-year" th:if="${product.annoPubblicazione != null}">
+                            <span class="year-badge" th:text="${product.annoPubblicazione}">2023</span>
                         </div>
                     </div>
-                    <div th:unless="${product.images != null and not #lists.isEmpty(product.images)}" class="no-image-placeholder">
-                        <span class="placeholder-icon">📷</span>
-                        <span class="placeholder-text">Nessuna immagine</span>
-                    </div>
-
-                    <!-- Quick View Overlay - Now inside image section -->
-                    <div class="card-overlay">
-                        <div class="overlay-content">
-                            <button class="quick-view-btn" th:data-product-id="${product.id}" th:onclick="'quickView(' + ${product.id} + ')'">
-                                <span class="btn-icon">👁️</span>
-                                <span class="btn-text">Anteprima rapida</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-content">
-                    <div class="product-header">
-                        <h3 class="product-name" th:text="${product.name}">Nome Prodotto</h3>
-                        <div class="product-price">
-                            <span class="price-symbol">€</span>
-                            <span class="price-value" th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
-                        </div>
-                    </div>
-
-                    <div class="product-description">
-                        <p th:text="${product.description}">Descrizione del prodotto...</p>
-                    </div>
-
-                    <div class="product-meta">
-                        <div class="meta-item">
-                            <span class="meta-icon">👤</span>
-                            <span class="meta-label">Venditore:</span>
-                            <span class="meta-value" th:text="${product.seller.username}">Venditore</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-actions">
-                    <a th:href="@{'/product/details/' + ${product.id}}" class="btn-primary">
-                        <span class="btn-icon">👁️</span>
-                        <span class="btn-text">Visualizza</span>
-                    </a>
                     
-                    <div th:if="${isAuthenticated and product.seller.username == username}" class="owner-actions">
-                        <a th:href="@{'/product/edit/' + ${product.id}}" class="btn-secondary">
-                            <span class="btn-icon">✏️</span>
-                            <span class="btn-text">Modifica</span>
-                        </a>
+                    <!-- Book Content Section -->
+                    <div class="book-content-section">
+                        <div class="book-header">
+                            <h3 class="book-title" th:text="${product.name}">Titolo Libro</h3>
+                        </div>
+                        
+                        <div class="book-meta">
+                            <div class="book-category" th:if="${product.category != null}">
+                                <span class="category-icon">�</span>
+                                <span th:text="${product.category.name}">Categoria</span>
+                            </div>
+                            
+                            <div class="book-authors" th:if="${product.autori != null and not #lists.isEmpty(product.autori)}">
+                                <span th:text="${#strings.listJoin(product.autori.![nome + ' ' + cognome], ', ')}">Autori</span>
+                            </div>
+                        </div>
+                        
+                        <div class="book-description" th:if="${product.description != null and not #strings.isEmpty(product.description)}">
+                            <p th:text="${#strings.abbreviate(product.description, 80)}">Descrizione del libro...</p>
+                        </div>
+                        
+                        <div class="book-footer">
+                            <div class="book-rating" th:if="${product.ratings != null and not #lists.isEmpty(product.ratings)}">
+                                <div class="rating-stars">
+                                    <span class="rating-value" th:text="${#numbers.formatDecimal(product.averageRating, 1, 1)}">4.5</span>
+                                </div>
+                                <span class="rating-count" th:text="'(' + ${#lists.size(product.ratings)} + ' recensioni)'">Reviews</span>
+                            </div>
+                            
+                            <a th:href="@{/product/details/{id}(id=${product.id})}" class="btn-view-book">
+                                <span>Leggi di più</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -326,7 +299,13 @@
     
     <!-- Include footer fragment -->
     <div th:insert="~{fragments/footer :: footer}"></div>    
-    <script th:src="@{/js/products-search.js}"></script>
+    <!-- <script th:src="@{/js/products-search.js}"></script> TEMPORANEAMENTE DISABILITATO -->
+    
+    <!-- Script di debug temporaneo -->
+    <script>
+    console.log('Script minimale caricato');
+    // Nessun JavaScript complesso per ora
+    </script>
 </body>
 </html>
 

@@ -198,7 +198,7 @@ public class AuthorController {
             Author savedAuthor = authorService.saveAuthorWithPhoto(author, authorFormDTO.getFotografia());
             
             logger.info("Author created successfully with ID: {}", savedAuthor.getId());
-            return "redirect:/author/" + savedAuthor.getId();
+            return "redirect:/authors/" + savedAuthor.getId();
             
         } catch (IOException e) {
             logger.error("Error saving author photo: {}", e.getMessage(), e);
@@ -289,7 +289,7 @@ public class AuthorController {
             Author updatedAuthor = authorService.updateAuthorWithPhoto(author, authorFormDTO.getFotografia());
             
             logger.info("Author updated successfully with ID: {}", updatedAuthor.getId());
-            return "redirect:/author/" + updatedAuthor.getId();
+            return "redirect:/authors/" + updatedAuthor.getId();
             
         } catch (IOException e) {
             logger.error("Error updating author photo: {}", e.getMessage(), e);
@@ -330,7 +330,7 @@ public class AuthorController {
             authorService.deleteAuthor(author);
             
             logger.info("Author deleted successfully with ID: {}", id);
-            return "redirect:/author";
+            return "redirect:/authors";
             
         } catch (Exception e) {
             logger.error("Error deleting author: {}", e.getMessage(), e);
@@ -344,7 +344,7 @@ public class AuthorController {
     // API per cercare autori (usata dal form di creazione libro)
     @GetMapping("/api/search")
     @ResponseBody
-    public List<Author> searchAuthors(@RequestParam("q") String query) {
+    public List<AuthorSearchResultDTO> searchAuthors(@RequestParam("q") String query) {
         try {
             if (query == null || query.trim().length() < 2) {
                 return List.of();
@@ -354,8 +354,17 @@ public class AuthorController {
             List<Author> authors = authorRepository.findByNomeContainingIgnoreCaseOrCognomeContainingIgnoreCase(
                 query.trim(), query.trim());
             
-            // Limita i risultati a 10
-            return authors.stream().limit(10).toList();
+            // Converti in DTO e limita i risultati a 10
+            return authors.stream()
+                    .limit(10)
+                    .map(author -> new AuthorSearchResultDTO(
+                        author.getId(),
+                        author.getNome(),
+                        author.getCognome(),
+                        author.getNazionalita(),
+                        author.getDataNascita() != null ? author.getDataNascita().getYear() : null
+                    ))
+                    .toList();
             
         } catch (Exception e) {
             logger.error("Error searching authors: {}", e.getMessage(), e);

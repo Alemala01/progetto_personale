@@ -1002,8 +1002,8 @@ class EnhancedProductCreator {
                         // Clear auto-saved data
                         localStorage.removeItem('productCreateAutoSave');
                         
-                        // Show success modal
-                        this.showSuccessModal();
+                        // Show success modal with product ID
+                        this.showSuccessModal(result.productId);
                     } else {
                         throw new Error(result.error || 'Errore sconosciuto');
                     }
@@ -1034,10 +1034,18 @@ class EnhancedProductCreator {
         }
     }
     
-    showSuccessModal() {
+    showSuccessModal(productId) {
         const modal = document.getElementById('successModal');
         if (modal) {
             modal.style.display = 'flex';
+            
+            // Update the "Visualizza Libro" link with the correct product ID
+            if (productId) {
+                const viewBookLink = modal.querySelector('.btn-primary[href="/products"]');
+                if (viewBookLink) {
+                    viewBookLink.href = `/product/details/${productId}`;
+                }
+            }
         }
     }
     
