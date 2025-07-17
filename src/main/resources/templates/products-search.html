@@ -2,310 +2,776 @@
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Ricerca Prodotti - Sitarello</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo Libri - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/products.css?v=10}" />
-    <link rel="stylesheet" th:href="@{/css/products-search-improved.css?v=7}" />
-    <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Scopri tutti i libri disponibili su Sitarello">
+    <style>
+        /* Products Page Styling */
+        .products-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .products-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            color: #ffffff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title i {
+            margin-right: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image-placeholder {
+            color: #6c757d;
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+
+        .product-header {
+            margin-bottom: 1rem;
+        }
+
+        .product-name {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.3;
+            min-height: 2.6rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0 0 1.5rem 0;
+            min-height: 3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-meta {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .product-info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .product-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            color: #667eea;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 90px;
+            font-size: 0.8rem;
+        }
+
+        .info-label i {
+            width: 14px;
+            text-align: center;
+        }
+
+        .info-value {
+            color: #2c3e50;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .product-ratings {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: rgba(255, 193, 7, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid #ffc107;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+        }
+
+        .rating-text {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+
+        .product-seller {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .product-seller i {
+            color: #667eea;
+        }
+
+        .product-seller a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .product-seller a:hover {
+            color: #5a6fd8;
+            text-decoration: underline;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: auto;
+        }
+
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex: 1;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .empty-actions, .page-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .page-actions {
+            margin-top: 3rem;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .filters-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filters-title {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .filters-title i {
+            color: #667eea;
+            margin-right: 0.5rem;
+        }
+
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            width: 14px;
+            text-align: center;
+        }
+
+        .form-input, .form-select {
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-search:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset {
+            background: white;
+            color: #6c757d;
+            padding: 0.75rem 2rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-reset:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .year-range {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .year-separator {
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        /* Responsive Filters */
+        @media (max-width: 768px) {
+            .filters-section {
+                padding: 1.5rem;
+            }
+            
+            .search-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-actions {
+                flex-direction: column;
+            }
+            
+            .btn-search, .btn-reset {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .products-container {
+                padding: 1rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .product-card {
+                padding: 1rem;
+            }
+            
+            .product-actions {
+                flex-direction: column;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .page-subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
 </head>
 <body class="products-page">
-    <!-- Animated Background -->
-    <div class="animated-bg"></div>
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-    
     <div th:insert="~{fragments/navbar :: navbar}"></div>
-
-    <!-- Hero Section -->
-    <section class="hero-search-section">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    <span class="hero-emoji">🔍</span>
-                    <span class="hero-title-text">Scopri il tuo prodotto perfetto</span>
-                </h1>
-                <p class="hero-subtitle">
-                    Naviga tra migliaia di prodotti con la nostra ricerca avanzata
-                </p>
-            </div>
-            <div class="hero-stats">
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${totalProducts}">0</div>
-                    <div class="stat-label">Prodotti</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${#lists.size(categories)}">0</div>
-                    <div class="stat-label">Categorie</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">⭐</div>
-                    <div class="stat-label">Qualità</div>
-                </div>
-            </div>
+    
+    <main class="products-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-book"></i>
+                Catalogo Libri
+            </h1>
+            <p class="page-subtitle">Scopri la nostra collezione di libri di qualità</p>
         </div>
-        <div class="hero-decoration">
-            <div class="floating-icon">🛍️</div>
-            <div class="floating-icon">💎</div>
-            <div class="floating-icon">🎯</div>
-        </div>
-    </section>
-
-    <main class="container">
-        <!-- Search Section -->
-        <section class="search-section">
-            <div class="search-container">
-                <form th:action="@{/products/search}" th:object="${searchDTO}" method="get" class="search-form">
-                    <!-- Quick Search Bar -->
-                    <div class="quick-search-bar">
-                        <div class="search-input-group">
-                            <span class="search-icon">🔍</span>
-                            <input type="text" 
-                                   id="quickSearch" 
-                                   th:field="*{searchTerm}" 
-                                   placeholder="Cerca prodotti, marchi, categorie... (Ctrl+K)"
-                                   class="quick-search-input" 
-                                   autocomplete="off" />
-                            <button type="submit" class="quick-search-btn">
-                                <span>Cerca</span>
-                                <i class="arrow">→</i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Filter Pills -->
-                    <div class="filter-pills">
-                        <div class="filter-pill" data-filter="category">
-                            <span class="pill-icon">📂</span>
-                            <select th:field="*{categoria}" class="pill-select">
-                                <option value="">Tutte le categorie</option>
-                                <option th:each="cat : ${categories}" 
-                                        th:value="${cat.name}" 
-                                        th:text="${cat.name}">Categoria</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-pill" data-filter="author">
-                            <span class="pill-icon">👤</span>
-                            <span class="pill-label">Autore</span>
-                            <input type="text" th:field="*{autore}" placeholder="Nome autore" class="pill-input" style="width: 120px;" />
-                        </div>
-                        
-                        <div class="filter-pill" data-filter="price">
-                            <span class="pill-icon">�</span>
-                            <span class="pill-label">Anno Pubblicazione</span>
-                            <input type="number" th:field="*{annoPubblicazioneMin}" placeholder="Min" class="pill-input" />
-                            <span class="pill-separator">-</span>
-                            <input type="number" th:field="*{annoPubblicazioneMax}" placeholder="Max" class="pill-input" />
-                        </div>
-                        
-                        <div class="filter-pill" data-filter="rating">
-                            <span class="pill-icon">⭐</span>
-                            <select th:field="*{ratingMin}" class="pill-select">
-                                <option value="">Qualsiasi</option>
-                                <option value="5">⭐⭐⭐⭐⭐</option>
-                                <option value="4">⭐⭐⭐⭐+</option>
-                                <option value="3">⭐⭐⭐+</option>
-                                <option value="2">⭐⭐+</option>
-                                <option value="1">⭐+</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-pill" data-filter="sort">
-                            <span class="pill-icon">📊</span>
-                            <select th:field="*{sortBy}" class="pill-select">
-                                <option value="id">Più recenti</option>
-                                <option value="name">Nome A-Z</option>
-                                <option value="anno">Anno ↑</option>
-                                <option value="anno_desc">Anno ↓</option>
-                                <option value="rating">Top rating</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="search-actions">
-                        <button type="submit" class="btn-search">
-                            <span class="btn-icon">🔍</span>
-                            <span class="btn-text">Cerca Prodotti</span>
-                        </button>
-                        <a th:href="@{/products/reset}" class="btn-reset">
-                            <span class="btn-icon">🔄</span>
-                            <span class="btn-text">Reset</span>
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </section>
         
-        <!-- Active Filters -->
-        <section th:if="${hasFilters}" class="active-filters-section">
-            <div class="active-filters-header">
-                <h3>🎯 Filtri attivi</h3>
-                <a th:href="@{/products/reset}" class="clear-all-btn">Cancella tutti</a>
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-header">
+                <h2 class="filters-title">
+                    <i class="fas fa-filter"></i>
+                    Filtra e Cerca
+                </h2>
             </div>
-            <div class="active-filters-list">
-                <div th:if="${searchDTO.hasSearchTerm()}" class="active-filter">
-                    <span class="filter-icon">🔍</span>
-                    <span class="filter-text" th:text="'&quot;' + ${searchDTO.searchTerm} + '&quot;'"></span>
-                    <button class="remove-filter" onclick="removeFilter('searchTerm')">×</button>
-                </div>
-                <div th:if="${searchDTO.hasCategoria()}" class="active-filter">
-                    <span class="filter-icon">📂</span>
-                    <span class="filter-text" th:text="${searchDTO.categoria}"></span>
-                    <button class="remove-filter" onclick="removeFilter('categoria')">×</button>
-                </div>
-                <div th:if="${searchDTO.hasAutore()}" class="active-filter">
-                    <span class="filter-icon">👤</span>
-                    <span class="filter-text" th:text="${searchDTO.autore}"></span>
-                    <button class="remove-filter" onclick="removeFilter('autore')">×</button>
-                </div>
-                <div th:if="${searchDTO.hasAnnoPubblicazioneMin()}" class="active-filter">
-                    <span class="filter-icon">�</span>
-                    <span class="filter-text" th:text="'Dal: ' + ${searchDTO.annoPubblicazioneMin}"></span>
-                    <button class="remove-filter" onclick="removeFilter('annoPubblicazioneMin')">×</button>
-                </div>
-                <div th:if="${searchDTO.hasAnnoPubblicazioneMax()}" class="active-filter">
-                    <span class="filter-icon">�</span>
-                    <span class="filter-text" th:text="'Al: ' + ${searchDTO.annoPubblicazioneMax}"></span>
-                    <button class="remove-filter" onclick="removeFilter('annoPubblicazioneMax')">×</button>
-                </div>
-                <div th:if="${searchDTO.hasRatingMin()}" class="active-filter">
-                    <span class="filter-icon">⭐</span>
-                    <span class="filter-text" th:text="'Min: ' + ${searchDTO.ratingMin} + ' stelle'"></span>
-                    <button class="remove-filter" onclick="removeFilter('ratingMin')">×</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Results Section -->
-        <section class="results-section">
-            <div class="results-header">
-                <div class="results-info">
-                    <h2 class="results-title">
-                        <span class="results-count" th:text="${totalProducts}">0</span>
-                        <span class="results-label">prodotti trovati</span>
-                    </h2>
-                    <div class="results-meta">
-                        <span th:if="${searchDTO.hasRatingMin()}" class="meta-badge">
-                            ⭐ Rating ≥ <span th:text="${searchDTO.ratingMin}"></span>
-                        </span>
-                        <span th:if="${searchDTO.sortBy == 'rating'}" class="meta-badge">
-                            📊 Ordinato per rating
-                        </span>
-                    </div>
-                </div>
-                <div class="results-actions">
-                    <button class="view-toggle" onclick="toggleView('grid')" id="gridView">
-                        <span class="toggle-icon">⊞</span>
-                        <span class="toggle-text">Griglia</span>
-                    </button>
-                    <button class="view-toggle active" onclick="toggleView('list')" id="listView">
-                        <span class="toggle-icon">☰</span>
-                        <span class="toggle-text">Lista</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Products Grid -->
-        <div class="products-container grid-view" id="productsContainer">
             
-            <div th:each="product : ${products}" class="product-card modern-card" th:data-product-id="${product.id}">
-                <div class="book-card-content">
-                    <!-- Book Image Section -->
-                    <div class="book-image-section">
-                        <div class="book-cover">
-                            <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" class="book-image-container">
-                                <img th:src="@{/product/image/{imageId}(imageId=${product.images[0].id})}" 
-                                     th:alt="${product.name}" 
-                                     class="book-cover-image" />
-                                <div class="image-overlay">
-                                    <span class="view-icon">Visualizza</span>
-                                </div>
-                            </div>
-                            <div th:unless="${product.images != null and not #lists.isEmpty(product.images)}" class="book-placeholder">
-                                <span class="placeholder-text">Copertina non disponibile</span>
-                            </div>
-                        </div>
-                        
-                        <div class="book-year" th:if="${product.annoPubblicazione != null}">
-                            <span class="year-badge" th:text="${product.annoPubblicazione}">2023</span>
-                        </div>
+            <form th:action="@{/products/search}" th:object="${searchDTO}" method="get" class="search-form">
+                <!-- First Row: Search Term and Category -->
+                <div class="search-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-search"></i>
+                            Cerca per titolo o descrizione
+                        </label>
+                        <input type="text" 
+                               th:field="*{searchTerm}" 
+                               placeholder="Inserisci titolo o parole chiave..."
+                               class="form-input" />
                     </div>
                     
-                    <!-- Book Content Section -->
-                    <div class="book-content-section">
-                        <div class="book-header">
-                            <h3 class="book-title" th:text="${product.name}">Titolo Libro</h3>
-                        </div>
-                        
-                        <div class="book-meta">
-                            <div class="book-category" th:if="${product.category != null}">
-                                <span class="category-icon">�</span>
-                                <span th:text="${product.category.name}">Categoria</span>
-                            </div>
-                            
-                            <div class="book-authors" th:if="${product.autori != null and not #lists.isEmpty(product.autori)}">
-                                <span th:text="${#strings.listJoin(product.autori.![nome + ' ' + cognome], ', ')}">Autori</span>
-                            </div>
-                        </div>
-                        
-                        <div class="book-description" th:if="${product.description != null and not #strings.isEmpty(product.description)}">
-                            <p th:text="${#strings.abbreviate(product.description, 80)}">Descrizione del libro...</p>
-                        </div>
-                        
-                        <div class="book-footer">
-                            <div class="book-rating" th:if="${product.ratings != null and not #lists.isEmpty(product.ratings)}">
-                                <div class="rating-stars">
-                                    <span class="rating-value" th:text="${#numbers.formatDecimal(product.averageRating, 1, 1)}">4.5</span>
-                                </div>
-                                <span class="rating-count" th:text="'(' + ${#lists.size(product.ratings)} + ' recensioni)'">Reviews</span>
-                            </div>
-                            
-                            <a th:href="@{/product/details/{id}(id=${product.id})}" class="btn-view-book">
-                                <span>Leggi di più</span>
-                            </a>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-tag"></i>
+                            Categoria
+                        </label>
+                        <select th:field="*{categoria}" class="form-select">
+                            <option value="">Tutte le categorie</option>
+                            <option th:each="cat : ${categories}" 
+                                    th:value="${cat.name}" 
+                                    th:text="${cat.name}">Categoria</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Second Row: Author and Year Range -->
+                <div class="search-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-feather-alt"></i>
+                            Autore
+                        </label>
+                        <input type="text" 
+                               th:field="*{autore}" 
+                               placeholder="Nome e cognome autore..."
+                               class="form-input" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            Anno di pubblicazione
+                        </label>
+                        <div class="year-range">
+                            <input type="number" 
+                                   th:field="*{annoPubblicazioneMin}" 
+                                   placeholder="Dal..."
+                                   min="1000" 
+                                   max="2030"
+                                   class="form-input" />
+                            <span class="year-separator">—</span>
+                            <input type="number" 
+                                   th:field="*{annoPubblicazioneMax}" 
+                                   placeholder="Al..."
+                                   min="1000" 
+                                   max="2030"
+                                   class="form-input" />
                         </div>
                     </div>
                 </div>
+
+                <!-- Third Row: Rating and Sort -->
+                <div class="search-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-star"></i>
+                            Rating minimo
+                        </label>
+                        <select th:field="*{ratingMin}" class="form-select">
+                            <option value="">Qualsiasi rating</option>
+                            <option value="5">⭐⭐⭐⭐⭐ (5 stelle)</option>
+                            <option value="4">⭐⭐⭐⭐+ (4+ stelle)</option>
+                            <option value="3">⭐⭐⭐+ (3+ stelle)</option>
+                            <option value="2">⭐⭐+ (2+ stelle)</option>
+                            <option value="1">⭐+ (1+ stelle)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-sort"></i>
+                            Ordina per
+                        </label>
+                        <select th:field="*{sortBy}" class="form-select">
+                            <option value="id">Più recenti</option>
+                            <option value="name">Nome A-Z</option>
+                            <option value="anno">Anno ↑</option>
+                            <option value="anno_desc">Anno ↓</option>
+                            <option value="rating">Top rating</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="search-actions">
+                    <button type="submit" class="btn-search">
+                        <i class="fas fa-search"></i>
+                        Cerca Libri
+                    </button>
+                    <a th:href="@{/products/reset}" class="btn-reset">
+                        <i class="fas fa-undo"></i>
+                        Reset Filtri
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Products Grid -->
+        <div th:if="${products != null && !products.isEmpty()}" class="products-grid">
+            <div th:each="product : ${products}" class="product-card">
+                <!-- Product Image -->
+                <div class="product-image">
+                    <div th:if="${product.images != null && !product.images.isEmpty()}">
+                        <img th:src="@{'/product/image/' + ${product.images[0].id}}" 
+                             th:alt="${product.name}" />
+                    </div>
+                    <div th:unless="${product.images != null && !product.images.isEmpty()}" class="product-image-placeholder">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                </div>
+                
+                <!-- Product Header -->
+                <div class="product-header">
+                    <h2 class="product-name" th:text="${product.name}">Titolo del Libro</h2>
+                </div>
+                
+                <!-- Product Description -->
+                <p class="product-description" th:text="${product.description}">Descrizione del libro</p>
+                
+                <!-- Product Meta Information -->
+                <div class="product-meta">
+                    <!-- Categoria -->
+                    <div class="product-info-item">
+                        <span class="info-label">
+                            <i class="fas fa-tag"></i>
+                            Categoria:
+                        </span>
+                        <span class="info-value" th:if="${product.category != null}" th:text="${product.category.name}">Categoria</span>
+                        <span class="info-value" th:if="${product.category == null}">Non specificata</span>
+                    </div>
+                    
+                    <!-- Autori -->
+                    <div class="product-info-item">
+                        <span class="info-label">
+                            <i class="fas fa-feather-alt"></i>
+                            Autore:
+                        </span>
+                        <span class="info-value" th:if="${product.autori != null and !product.autori.isEmpty()}">
+                            <span th:each="author, iterStat : ${product.autori}">
+                                <span th:text="${author.nome + ' ' + author.cognome}">Autore</span>
+                                <span th:if="${!iterStat.last}">, </span>
+                            </span>
+                        </span>
+                        <span class="info-value" th:if="${product.autori == null or product.autori.isEmpty()}">Non specificato</span>
+                    </div>
+                    
+                    <!-- Anno di pubblicazione -->
+                    <div class="product-info-item" th:if="${product.annoPubblicazione != null}">
+                        <span class="info-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            Anno:
+                        </span>
+                        <span class="info-value" th:text="${product.annoPubblicazione}">Anno</span>
+                    </div>
+                </div>
+                
+                <!-- Product Ratings -->
+                <div class="product-ratings" th:if="${product.ratings != null and !product.ratings.isEmpty()}">
+                    <div class="rating-stars">
+                        <span th:each="star : ${#numbers.sequence(1, 5)}">
+                            <i th:class="${star <= product.averageRating ? 'fas fa-star' : 'far fa-star'}"></i>
+                        </span>
+                    </div>
+                    <span class="rating-text" th:text="${#numbers.formatDecimal(product.averageRating, 1, 1)} + ' (' + ${product.ratingCount} + ' recensioni)'">
+                        4.5 (12 recensioni)
+                    </span>
+                </div>
+                
+                <!-- Product Seller -->
+                <div class="product-seller">
+                    <i class="fas fa-user"></i>
+                    <span>Venditore:</span>
+                    <a th:href="@{/users/seller/{username}(username=${product.seller.username})}" th:text="${product.seller.username}">
+                        Nome Venditore
+                    </a>
+                </div>
+                
+                <!-- Product Actions -->
+                <div class="product-actions">
+                    <a th:href="@{/product/details/{id}(id=${product.id})}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> Visualizza
+                    </a>
+                    
+                    <!-- Pulsante di modifica solo se l'utente è autenticato e proprietario del prodotto -->
+                    <a th:if="${isAuthenticated and product.seller.username == username}" 
+                       th:href="@{/product/edit/{id}(id=${product.id})}" 
+                       class="btn btn-outline">
+                        <i class="fas fa-edit"></i> Modifica
+                    </a>
+                </div>
             </div>
         </div>
-
+        
         <!-- Empty State -->
-        <div th:if="${totalProducts == 0}" class="empty-state">
-            <div class="empty-icon">🔍</div>
-            <h3 class="empty-title">Nessun prodotto trovato</h3>
-            <p class="empty-message">
-                Prova a modificare i filtri di ricerca o esplora tutte le nostre categorie
-            </p>
+        <div th:if="${products == null || products.isEmpty()}" class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h3>Nessun libro disponibile</h3>
+            <p>Al momento non ci sono libri disponibili nel catalogo. Torna più tardi per scoprire le novità!</p>
             <div class="empty-actions">
-                <a th:href="@{/products/reset}" class="btn-primary">
-                    <span class="btn-icon">🔄</span>
-                    <span class="btn-text">Rimuovi filtri</span>
+                <a th:href="@{/}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> 
+                    Torna alla Home
                 </a>
-                <a th:href="@{/products}" class="btn-secondary">
-                    <span class="btn-icon">📂</span>
-                    <span class="btn-text">Vedi tutti i prodotti</span>
+                <a th:href="@{/product/create}" class="btn btn-outline" sec:authorize="isAuthenticated()">
+                    <i class="fas fa-plus"></i> 
+                    Aggiungi Libro
                 </a>
             </div>
+        </div>
+        
+        <!-- Page Actions -->
+        <div th:if="${products != null && !products.isEmpty()}" class="page-actions">
+            <a th:href="@{/}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> 
+                Torna alla Home
+            </a>
+            <a th:href="@{/product/create}" class="btn btn-primary" sec:authorize="isAuthenticated()">
+                <i class="fas fa-plus"></i> 
+                Aggiungi Libro
+            </a>
         </div>
     </main>
     
     <!-- Include footer fragment -->
-    <div th:insert="~{fragments/footer :: footer}"></div>    
-    <!-- <script th:src="@{/js/products-search.js}"></script> TEMPORANEAMENTE DISABILITATO -->
-    
-    <!-- Script di debug temporaneo -->
-    <script>
-    console.log('Script minimale caricato');
-    // Nessun JavaScript complesso per ora
-    </script>
+    <div th:insert="~{fragments/footer :: footer}"></div>
 </body>
 </html>
 

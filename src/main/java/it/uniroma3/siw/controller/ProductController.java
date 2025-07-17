@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import it.uniroma3.siw.dto.ProductFormDTO;
 import it.uniroma3.siw.model.Author;
@@ -388,7 +389,8 @@ public class ProductController {
     // Endpoint per salvare le modifiche ai dettagli
     @PostMapping("/edit/details")
     public String handleEditDetails(@Valid @ModelAttribute ProductFormDTO productFormDTO,
-                                    BindingResult result, HttpSession session, Model model) {
+                                    BindingResult result, HttpSession session, Model model,
+                                    RedirectAttributes redirectAttributes) {
         try {
             addAuthenticationAttributes(model);
             Long productId = (Long) session.getAttribute("editingProductId");
@@ -426,9 +428,11 @@ public class ProductController {
 
             if (result.hasErrors()) {
                 model.addAttribute("product", product);
-                // Aggiungi le categorie quando ci sono errori
+                // Aggiungi le categorie e autori quando ci sono errori
                 List<Category> categories = (List<Category>) categoryRepository.findAll();
                 model.addAttribute("categories", categories);
+                List<Author> authors = (List<Author>) authorRepository.findAll();
+                model.addAttribute("authors", authors);
                 return "edit-details";
             }
             
@@ -436,8 +440,11 @@ public class ProductController {
             productService.updateProductDetails(product, productFormDTO);
             session.removeAttribute("editingProductId");
             
-            logger.debug("Product details updated successfully for ID: {}", productId);
-            return "redirect:/product/" + productId;
+            // Aggiungi messaggio di successo
+            redirectAttributes.addFlashAttribute("successMessage", "Prodotto aggiornato con successo!");
+            
+            logger.info("Product details updated successfully for ID: {} by user: {}", productId, authenticatedUser.getUsername());
+            return "redirect:/product/details/" + productId;
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));

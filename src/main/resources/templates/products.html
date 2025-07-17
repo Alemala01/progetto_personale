@@ -5,36 +5,361 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elenco Prodotti - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/products.css?v=13}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <meta name="description" content="Scopri tutti i prodotti disponibili su Sitarello">
+    <style>
+        /* Products Page Styling */
+        .products-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .products-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            color: #ffffff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title i {
+            margin-right: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image-placeholder {
+            color: #6c757d;
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+
+        .product-header {
+            margin-bottom: 1rem;
+        }
+
+        .product-name {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.3;
+            min-height: 2.6rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0 0 1.5rem 0;
+            min-height: 3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-meta {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .product-info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .product-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            color: #667eea;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 90px;
+            font-size: 0.8rem;
+        }
+
+        .info-label i {
+            width: 14px;
+            text-align: center;
+        }
+
+        .info-value {
+            color: #2c3e50;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .product-ratings {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: rgba(255, 193, 7, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid #ffc107;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+        }
+
+        .rating-text {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+
+        .product-seller {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .product-seller i {
+            color: #667eea;
+        }
+
+        .product-seller a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .product-seller a:hover {
+            color: #5a6fd8;
+            text-decoration: underline;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: auto;
+        }
+
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex: 1;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .empty-actions, .page-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .page-actions {
+            margin-top: 3rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .products-container {
+                padding: 1rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .product-card {
+                padding: 1rem;
+            }
+            
+            .product-actions {
+                flex-direction: column;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .page-subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
 </head>
 <body class="products-page">
-    <!-- Animated Background -->
-    <div class="animated-bg"></div>
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-    
     <div th:insert="~{fragments/navbar :: navbar}"></div>
     
     <main class="products-container">
         <div class="page-header">
-            <div class="header-content">
-                <h1 class="page-title">
-                    <i class="fas fa-box-open"></i>
-                    Tutti i Prodotti
-                </h1>
-                <p class="page-subtitle">Scopri la nostra selezione completa di prodotti di qualità</p>
-            </div>
+            <h1 class="page-title">
+                <i class="fas fa-book"></i>
+                Catalogo Libri
+            </h1>
+            <p class="page-subtitle">Scopri la nostra collezione di libri di qualità</p>
         </div>
         
         <!-- Products Grid -->
@@ -42,106 +367,117 @@
             <div th:each="product : ${products}" class="product-card">
                 <!-- Product Image -->
                 <div class="product-image">
-                    <div th:if="${product.images != null && !product.images.isEmpty()}" 
-                         th:class="${'product-image-grid ' + (product.images.size() == 1 ? ' single' : (product.images.size() == 3 ? ' three' : (product.images.size() >= 4 ? ' four' : '')))}">
-                        <img th:each="image, iterStat : ${product.images}" 
-                             th:if="${iterStat.index < 4}"
-                             th:src="@{'/product/image/' + ${image.id}}" 
+                    <div th:if="${product.images != null && !product.images.isEmpty()}">
+                        <img th:src="@{'/product/image/' + ${product.images[0].id}}" 
                              th:alt="${product.name}" />
                     </div>
                     <div th:unless="${product.images != null && !product.images.isEmpty()}" class="product-image-placeholder">
-                        <i class="fas fa-image"></i>
+                        <i class="fas fa-book-open"></i>
                     </div>
                 </div>
                 
-                <!-- Product Content -->
-                <div class="product-content">
-                    <div class="product-header">
-                        <h2 class="product-name" th:text="${product.name}">Nome Prodotto</h2>
+                <!-- Product Header -->
+                <div class="product-header">
+                    <h2 class="product-name" th:text="${product.name}">Titolo del Libro</h2>
+                </div>
+                
+                <!-- Product Description -->
+                <p class="product-description" th:text="${product.description}">Descrizione del libro</p>
+                
+                <!-- Product Meta Information -->
+                <div class="product-meta">
+                    <!-- Categoria -->
+                    <div class="product-info-item">
+                        <span class="info-label">
+                            <i class="fas fa-tag"></i>
+                            Categoria:
+                        </span>
+                        <span class="info-value" th:if="${product.category != null}" th:text="${product.category.name}">Categoria</span>
+                        <span class="info-value" th:if="${product.category == null}">Non specificata</span>
                     </div>
                     
-                    <div class="product-meta">
-                        <!-- Categoria con label -->
-                        <div class="product-info-item">
-                            <span class="info-label">
-                                <i class="fas fa-tag"></i>
-                                Categoria:
+                    <!-- Autori -->
+                    <div class="product-info-item">
+                        <span class="info-label">
+                            <i class="fas fa-feather-alt"></i>
+                            Autore:
+                        </span>
+                        <span class="info-value" th:if="${product.autori != null and !product.autori.isEmpty()}">
+                            <span th:each="author, iterStat : ${product.autori}">
+                                <span th:text="${author.nome + ' ' + author.cognome}">Autore</span>
+                                <span th:if="${!iterStat.last}">, </span>
                             </span>
-                            <span class="info-value" th:if="${product.category != null}" th:text="${product.category.name}">Categoria</span>
-                            <span class="info-value" th:if="${product.category == null}">Non specificata</span>
-                        </div>
-                        
-                        <!-- Autori con label -->
-                        <div class="product-info-item" th:if="${product.autori != null}">
-                            <span class="info-label">
-                                <i class="fas fa-feather-alt"></i>
-                                Autore:
-                            </span>
-                            <span class="info-value" th:if="${not #lists.isEmpty(product.autori)}">
-                                <span th:each="author, iterStat : ${product.autori}">
-                                    <span th:text="${author.nome + ' ' + author.cognome}">Autore</span>
-                                    <span th:if="${!iterStat.last}">, </span>
-                                </span>
-                            </span>
-                            <span class="info-value" th:if="${#lists.isEmpty(product.autori)}">Non specificato</span>
-                        </div>
-                        
-                        <!-- Anno pubblicazione se disponibile -->
-                        <div class="product-info-item" th:if="${product.annoPubblicazione != null}">
-                            <span class="info-label">
-                                <i class="fas fa-calendar-alt"></i>
-                                Anno:
-                            </span>
-                            <span class="info-value" th:text="${product.annoPubblicazione}">Anno</span>
-                        </div>
+                        </span>
+                        <span class="info-value" th:if="${product.autori == null or product.autori.isEmpty()}">Non specificato</span>
                     </div>
                     
-                    <p class="product-description" th:text="${product.description}">Descrizione del prodotto</p>
-                    
-                    <div class="product-seller">
-                        <i class="fas fa-user"></i>
-                        <span>Venditore:</span>
-                        <a th:href="@{/users/seller/{username}(username=${product.seller.username})}" th:text="${product.seller.username}">
-                            Nome Venditore
-                        </a>
+                    <!-- Anno di pubblicazione -->
+                    <div class="product-info-item" th:if="${product.annoPubblicazione != null}">
+                        <span class="info-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            Anno:
+                        </span>
+                        <span class="info-value" th:text="${product.annoPubblicazione}">Anno</span>
                     </div>
-                    
-                    <div class="product-actions">
-                        <a th:href="@{/product/details/{id}(id=${product.id})}" class="btn btn-primary">
-                            <i class="fas fa-eye"></i> Visualizza
-                        </a>
-                        
-                        <!-- Pulsante di modifica solo se l'utente è autenticato e proprietario del prodotto -->
-                        <a th:if="${isAuthenticated and product.seller.username == username}" 
-                           th:href="@{/product/edit/{id}(id=${product.id})}" 
-                           class="btn btn-outline">
-                            <i class="fas fa-edit"></i> Modifica
-                        </a>
+                </div>
+                
+                <!-- Product Ratings -->
+                <div class="product-ratings" th:if="${product.ratings != null and !product.ratings.isEmpty()}">
+                    <div class="rating-stars">
+                        <span th:each="star : ${#numbers.sequence(1, 5)}">
+                            <i th:class="${star <= product.averageRating ? 'fas fa-star' : 'far fa-star'}"></i>
+                        </span>
                     </div>
+                    <span class="rating-text" th:text="${#numbers.formatDecimal(product.averageRating, 1, 1)} + ' (' + ${product.ratingCount} + ' recensioni)'">
+                        4.5 (12 recensioni)
+                    </span>
+                </div>
+                
+                <!-- Product Seller -->
+                <div class="product-seller">
+                    <i class="fas fa-user"></i>
+                    <span>Venditore:</span>
+                    <a th:href="@{/users/seller/{username}(username=${product.seller.username})}" th:text="${product.seller.username}">
+                        Nome Venditore
+                    </a>
+                </div>
+                
+                <!-- Product Actions -->
+                <div class="product-actions">
+                    <a th:href="@{/product/details/{id}(id=${product.id})}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> Visualizza
+                    </a>
+                    
+                    <!-- Pulsante di modifica solo se l'utente è autenticato e proprietario del prodotto -->
+                    <a th:if="${isAuthenticated and product.seller.username == username}" 
+                       th:href="@{/product/edit/{id}(id=${product.id})}" 
+                       class="btn btn-outline">
+                        <i class="fas fa-edit"></i> Modifica
+                    </a>
                 </div>
             </div>
         </div>
         
-        <!-- Enhanced Empty State -->
+        <!-- Empty State -->
         <div th:if="${products == null || products.isEmpty()}" class="empty-state">
             <div class="empty-icon">
-                <i class="fas fa-box-open"></i>
+                <i class="fas fa-book-open"></i>
             </div>
-            <h3>Nessun prodotto disponibile</h3>
-            <p>Al momento non ci sono prodotti disponibili. Torna più tardi per scoprire le novità!</p>
+            <h3>Nessun libro disponibile</h3>
+            <p>Al momento non ci sono libri disponibili nel catalogo. Torna più tardi per scoprire le novità!</p>
             <div class="empty-actions">
                 <a th:href="@{/}" class="btn btn-primary">
                     <i class="fas fa-home"></i> 
                     Torna alla Home
                 </a>
-                <a th:href="@{/product/create}" class="btn btn-secondary" sec:authorize="isAuthenticated()">
+                <a th:href="@{/product/create}" class="btn btn-outline" sec:authorize="isAuthenticated()">
                     <i class="fas fa-plus"></i> 
-                    Aggiungi Prodotto
+                    Aggiungi Libro
                 </a>
             </div>
         </div>
         
-        <!-- Enhanced Back to Home Button -->
+        <!-- Page Actions -->
         <div th:if="${products != null && !products.isEmpty()}" class="page-actions">
             <a th:href="@{/}" class="btn btn-outline">
                 <i class="fas fa-arrow-left"></i> 
@@ -149,7 +485,7 @@
             </a>
             <a th:href="@{/product/create}" class="btn btn-primary" sec:authorize="isAuthenticated()">
                 <i class="fas fa-plus"></i> 
-                Aggiungi Prodotto
+                Aggiungi Libro
             </a>
         </div>
     </main>
