@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${product.name + ' - Dettagli Libro - Libreria Sitarello'}">Dettagli Libro - Libreria Sitarello</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <title th:text="${product.name + ' - Dettagli Libro - SiwBooks'}">Dettagli Libro - SiwBooks</title>
+    
+    <!-- Common Head -->
+    <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
+    
+    <!-- Page specific CSS -->
     <link rel="stylesheet" th:href="@{/css/product-details-view.css}" />
     <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="animated-bg">
@@ -19,10 +19,33 @@
         </div>
     </div>
     
-    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    <!-- Navbar -->
+    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
+
+    <!-- Hero Section come homepage - Updated with warm colors -->
+    <div class="hero-section" style="background: linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, rgba(156, 175, 136, 0.15) 100%); padding: 4rem 0 2rem; margin-bottom: 2rem; position: relative; overflow: hidden;">
+        <div class="hero-background" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+            <div class="hero-pattern" style="background: radial-gradient(circle at 30% 30%, rgba(212, 165, 116, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(156, 175, 136, 0.1) 0%, transparent 50%);"></div>
+        </div>
+        
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; text-align: center;">
+            <div class="hero-badge" style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(61, 53, 41, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(61, 53, 41, 0.2); border-radius: 25px; padding: 0.5rem 1.5rem; margin-bottom: 1.5rem; color: #3d3529; font-weight: 600; font-size: 0.9rem;">
+                <i class="fas fa-book-open"></i>
+                <span>Dettagli Libro</span>
+            </div>
+            
+            <h1 class="hero-title" style="font-size: 2.5rem; font-weight: 700; color: #3d3529; margin-bottom: 1rem; font-family: 'Inter', sans-serif;" th:text="${product.name}">
+                Titolo del Libro
+            </h1>
+            
+            <p class="hero-subtitle" style="font-size: 1.2rem; color: #6b5b47; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6; font-family: 'Inter', sans-serif;">
+                Esplora tutti i dettagli, le recensioni e le informazioni su questo libro
+            </p>
+        </div>
+    </div>
 
     <main class="container">
-        <!-- Breadcrumb moderno -->
+        <!-- Breadcrumb stile homepage -->
         <div class="breadcrumb" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 1rem 2rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.2); display: flex; align-items: center; gap: 1rem; font-weight: 500;">
             <a th:href="@{/}" style="color: #3498db; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
                 <i class="fas fa-home"></i> Home
@@ -33,7 +56,7 @@
             </a>
             <i class="fas fa-chevron-right" style="color: #bdc3c7; font-size: 0.8rem;"></i>
             <strong th:text="${product.name}" style="color: #2c3e50; display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.05rem;">
-                <i class="fas fa-book-open"></i> Libro
+                <i class="fas fa-book-open"></i>
             </strong>
         </div>
 
@@ -48,7 +71,9 @@
             <span th:text="${errorMessage}">Messaggio di errore</span>
         </div>
 
-        <div class="product-detail-container">
+        <!-- Contenitore principale con stile homepage -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);">
+            <div class="product-detail-container">
             <!-- Sezione Immagini -->
             <div class="product-images">
                 <div th:if="${product.images != null and not #lists.isEmpty(product.images)}">
@@ -237,6 +262,8 @@
                 </div>
             </div>
         </div>
+        <!-- Fine contenitore glassmorphism -->
+        </div>
     </main>
 
     <!-- Modal per visualizzazione immagini a schermo intero -->
@@ -286,7 +313,7 @@
             const email = /*[[${product.seller.email}]]*/ 'email@example.com';
             const productName = /*[[${product.name}]]*/ 'Prodotto';
             const subject = 'Interesse per: ' + productName;
-            const body = 'Ciao,\n\nSono interessato al tuo prodotto "' + productName + '" su Sitarello.\n\nPotresti fornirmi maggiori informazioni?\n\nGrazie!';
+            const body = 'Ciao,\n\nSono interessato al tuo prodotto "' + productName + '" su SiwBooks.\n\nPotresti fornirmi maggiori informazioni?\n\nGrazie!';
             
             window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
@@ -297,7 +324,7 @@
             if (navigator.share) {
                 navigator.share({
                     title: productName,
-                    text: 'Guarda questo prodotto su Sitarello!',
+                    text: 'Guarda questo prodotto su SiwBooks!',
                     url: window.location.href
                 });
             } else {

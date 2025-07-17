@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${product.name} + ' - Dettagli Prodotto'">Dettagli Prodotto</title>
+    
+    <!-- Common Head -->
+    <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
+    
+    <!-- Page specific CSS -->
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/product-view.css}" />
     <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="animated-bg">
@@ -20,7 +24,7 @@
     </div>
     
     <!-- Include navbar fragment -->
-    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
     
     <main class="container">
         <div class="product-header">

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Libri - SiwBooks</title>
+    
+    <!-- Common Head -->
+    <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
+    
+    <!-- Page specific CSS -->
+    <link rel="stylesheet" th:href="@{/css/products.css}" />
+</head>
+<body>
+    <!-- Navbar -->
+    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
+    
+    <!-- Contenuto della pagina -->
+    <div class="container">
+        <h1>I Nostri Libri</h1>
+        <p>Qui andranno tutti i libri...</p>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 SiwBooks. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import org.springframework.web.bind.annotation.ModelAttribute;
+
 import it.uniroma3.siw.model.Author;
 import it.uniroma3.siw.model.Category;
 import it.uniroma3.siw.model.Product;
@@ -42,6 +44,15 @@ public class GlobalController {
     @Autowired
     private UsersRepository usersRepository;
 
+    /**
+     * Metodo che aggiunge automaticamente gli attributi di autenticazione 
+     * a tutte le pagine del sito
+     */
+    @ModelAttribute
+    public void addGlobalAttributes(Model model) {
+        addAuthenticationAttributes(model);
+    }
+
     private void addAuthenticationAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAuthenticated = auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser");
@@ -63,7 +74,6 @@ public class GlobalController {
     public String index(Model model, @RequestParam(required = false) String logout) {
         try {
             logger.info("Loading homepage...");
-            addAuthenticationAttributes(model);
             
             // Aggiungi messaggio di logout success se presente
             if ("success".equals(logout)) {
@@ -150,13 +160,11 @@ public class GlobalController {
 
     @GetMapping("/about")
     public String about(Model model) {
-        addAuthenticationAttributes(model);
         return "about"; // Template da creare per informazioni sulla libreria
     }
 
     @GetMapping("/contact")
     public String contact(Model model) {
-        addAuthenticationAttributes(model);
         return "contact"; // Template da creare per i contatti
     }
 
@@ -164,7 +172,6 @@ public class GlobalController {
     @Transactional(readOnly = true)
     public String statistics(Model model) {
         try {
-            addAuthenticationAttributes(model);
 
             // Statistiche dettagliate per la dashboard
             long totalBooks = productRepository.count();
@@ -275,7 +282,6 @@ public class GlobalController {
     @Transactional(readOnly = true)
     public String testIndex(Model model) {
         try {
-            addAuthenticationAttributes(model);
 
             // Dati semplici senza errori
             model.addAttribute("latestBooks", new ArrayList<>());

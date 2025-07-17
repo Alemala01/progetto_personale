@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo Libri - Sitarello</title>
+    
+    <!-- Common Head -->
+    <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
+    
+    <!-- Page specific CSS -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/products-catalog.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <meta name="description" content="Scopri tutti i libri disponibili su Sitarello">
+</head>
+<body class="products-page">
+    <!-- Navbar -->
+    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
+    
+    <main class="products-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-book"></i>
+                Catalogo Libri
+            </h1>
+            <p class="page-subtitle">Scopri la nostra collezione di libri selezionati</p>
+        </div>
+
+        <!-- Search and Filters Section -->
+        <div class="filters-section">
+            <form th:action="@{/products}" method="get" class="search-form">
+                <div class="search-row">
+                    <div class="form-group">
+                        <label class="form-label" for="name">
+                            <i class="fas fa-search"></i>
+                            Nome Libro
+                        </label>
+                        <input type="text" 
+                               id="name" 
+                               name="name" 
+                               th:value="${searchName}" 
+                               placeholder="Cerca per titolo..." 
+                               class="form-input search-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="authorName">
+                            <i class="fas fa-user-edit"></i>
+                            Autore
+                        </label>
+                        <input type="text" 
+                               id="authorName" 
+                               name="authorName" 
+                               th:value="${searchAuthor}" 
+                               placeholder="Cerca per autore..." 
+                               class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="category">
+                            <i class="fas fa-tags"></i>
+                            Categoria
+                        </label>
+                        <select id="category" name="category" class="form-select">
+                            <option value="">Tutte le categorie</option>
+                            <option th:each="cat : ${categories}" 
+                                    th:value="${cat}" 
+                                    th:text="${cat}"
+                                    th:selected="${cat == searchCategory}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="search-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            Anno pubblicazione
+                        </label>
+                        <div class="year-range">
+                            <input type="number" 
+                                   name="yearFrom" 
+                                   th:value="${yearFrom}" 
+                                   placeholder="Da" 
+                                   min="1900" 
+                                   max="2024" 
+                                   class="form-input">
+                            <span class="year-separator">-</span>
+                            <input type="number" 
+                                   name="yearTo" 
+                                   th:value="${yearTo}" 
+                                   placeholder="A" 
+                                   min="1900" 
+                                   max="2024" 
+                                   class="form-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="search-actions">
+                    <button type="submit" class="btn search-btn">
+                        <i class="fas fa-search"></i>
+                        Cerca
+                    </button>
+                    <a th:href="@{/products}" class="btn btn-outline">
+                        <i class="fas fa-times"></i>
+                        Cancella filtri
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Products Grid -->
+        <div th:if="${products != null and !products.empty}" class="products-grid">
+            <div class="product-card" th:each="product : ${products}">
+                <!-- Product Image -->
+                <div class="product-image">
+                    <img th:if="${product.images != null and !product.images.empty}" 
+                         th:src="@{'/product-images/' + ${product.images[0].filename}}" 
+                         th:alt="${product.name}"
+                         loading="lazy">
+                    <div th:unless="${product.images != null and !product.images.empty}" 
+                         class="product-image-placeholder">
+                        <i class="fas fa-book"></i>
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="product-header">
+                    <h3 class="product-name" th:text="${product.name}">Nome Prodotto</h3>
+                    <p class="product-description" th:text="${product.description}">Descrizione prodotto</p>
+                </div>
+
+                <!-- Product Meta Information -->
+                <div class="product-meta">
+                    <div class="product-info-item">
+                        <span class="product-info-label">
+                            <i class="fas fa-tag"></i>
+                            Categoria:
+                        </span>
+                        <span class="product-info-value" th:text="${product.category}">Categoria</span>
+                    </div>
+                    <div class="product-info-item" th:if="${product.year != null}">
+                        <span class="product-info-label">
+                            <i class="fas fa-calendar"></i>
+                            Anno:
+                        </span>
+                        <span class="product-info-value" th:text="${product.year}">Anno</span>
+                    </div>
+                    <div class="product-info-item">
+                        <span class="product-info-label">
+                            <i class="fas fa-store"></i>
+                            Venditore:
+                        </span>
+                        <span class="product-info-value" th:text="${product.user.username}">Venditore</span>
+                    </div>
+                </div>
+
+                <!-- Price -->
+                <div class="product-price" th:text="'€ ' + ${product.price}">€ 0.00</div>
+
+                <!-- Authors -->
+                <div class="product-authors" th:if="${product.authors != null and !product.authors.empty}">
+                    <div class="authors-label">Autori:</div>
+                    <div class="authors-list">
+                        <a th:each="author : ${product.authors}" 
+                           th:href="@{'/authors/' + ${author.id}}" 
+                           th:text="${author.nome + ' ' + author.cognome}"
+                           class="author-link">
+                            Nome Autore
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Badges -->
+                <div class="product-badges">
+                    <span class="category-badge" th:text="${product.category}">Categoria</span>
+                    <span class="year-badge" th:if="${product.year != null}" th:text="${product.year}">Anno</span>
+                </div>
+
+                <!-- Actions -->
+                <div class="product-actions">
+                    <a th:href="@{'/products/' + ${product.id}}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i>
+                        Dettagli
+                    </a>
+                    <a th:href="@{'/seller/' + ${product.user.id}}" class="btn btn-outline">
+                        <i class="fas fa-user"></i>
+                        Venditore
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Products Message -->
+        <div th:if="${products == null or products.empty}" class="no-products">
+            <i class="fas fa-search no-products-icon"></i>
+            <h3>Nessun libro trovato</h3>
+            <p th:if="${searchName != null or searchAuthor != null or searchCategory != null}">
+                Non sono stati trovati libri che corrispondono ai criteri di ricerca.
+            </p>
+            <p th:unless="${searchName != null or searchAuthor != null or searchCategory != null}">
+                Al momento non ci sono libri disponibili nel catalogo.
+            </p>
+            <div class="page-actions">
+                <a th:href="@{/products}" class="btn btn-primary">
+                    <i class="fas fa-refresh"></i>
+                    Visualizza tutti i libri
+                </a>
+                <a th:href="@{/}" class="btn btn-outline">
+                    <i class="fas fa-home"></i>
+                    Torna alla Home
+                </a>
+            </div>
+        </div>
+
+        <!-- Back to Top Button -->
+        <div class="page-actions" th:if="${products != null and !products.empty}">
+            <a href="#top" class="btn btn-outline">
+                <i class="fas fa-arrow-up"></i>
+                Torna su
+            </a>
+            <a th:href="@{/}" class="btn btn-primary">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>

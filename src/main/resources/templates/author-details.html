@@ -4,13 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${author.nome + ' ' + author.cognome + ' - Libreria Sitarello'}">Autore - Libreria Sitarello</title>
+    
+    <!-- Common Head -->
+    <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
+    
+    <!-- Page specific CSS -->
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/author-details.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    <!-- Navbar -->
+    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
 
     <main class="container">
         <!-- Breadcrumb -->

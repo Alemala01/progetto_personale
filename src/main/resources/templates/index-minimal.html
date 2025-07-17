@@ -1,95 +1,17 @@
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Libreria Sitarello</title>
+    <title>Home - SiwBooks</title>
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Common Head -->
+    <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
+    <!-- Homepage specific CSS -->
     <link rel="stylesheet" th:href="@{/css/minimal-homepage.css}" />
-    <link rel="stylesheet" th:href="@{/css/minimal-navbar-monochrome.css}" />
-    <link rel="stylesheet" th:href="@{/css/minimal-footer-modern.css}" />
 </head>
 <body>
-    <!-- Minimal Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a th:href="@{/}" class="navbar-brand">
-                <i class="fas fa-book"></i>
-                Libreria Sitarello
-            </a>
-            
-            <button class="mobile-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <ul class="navbar-menu">
-                <li>
-                    <a th:href="@{/products}" class="nav-link">
-                        <i class="fas fa-book"></i>
-                        Libri
-                    </a>
-                </li>
-                <li>
-                    <a th:href="@{/authors}" class="nav-link">
-                        <i class="fas fa-user-pen"></i>
-                        Autori
-                    </a>
-                </li>
-                <li th:if="${isAdmin}">
-                    <a th:href="@{/product/create}" class="nav-link">
-                        <i class="fas fa-plus"></i>
-                        Aggiungi Libro
-                    </a>
-                </li>
-            </ul>
-            
-            <div class="auth-buttons">
-                <div th:if="${isAuthenticated}" class="user-dropdown">
-                    <a href="#" class="user-btn">
-                        <div class="user-avatar" th:text="${#strings.substring(username, 0, 1).toUpperCase()}">U</div>
-                        <span th:text="${username}">User</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a th:href="@{/users/profile}">
-                            <i class="fas fa-user"></i>
-                            Il mio profilo
-                        </a>
-                        <div th:if="${isAdmin}" class="separator"></div>
-                        <a th:if="${isAdmin}" th:href="@{/admin}">
-                            <i class="fas fa-cog"></i>
-                            Pannello Admin
-                        </a>
-                        <div class="separator"></div>
-                        <a th:href="@{/logout}">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Esci
-                        </a>
-                    </div>
-                </div>
-                
-                <div th:unless="${isAuthenticated}">
-                    <a th:href="@{/users/login}" class="btn btn-outline">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Accedi
-                    </a>
-                    <a th:href="@{/users/register}" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i>
-                        Registrati
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <!-- Navbar -->
+    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
 
     <!-- Hero Section -->
     <section class="hero-section">
@@ -99,7 +21,7 @@
                 <span>Libreria Digitale #1 in Italia</span>
             </div>
             
-            <h1 class="hero-title">Benvenuto nella Libreria Sitarello</h1>
+            <h1 class="hero-title">Benvenuto in SiwBooks</h1>
             <p class="hero-subtitle">Scopri, esplora e condividi la tua passione per i libri. La biblioteca digitale che unisce lettori e autori in un'esperienza di lettura unica.</p>
             
             <div class="hero-stats">
@@ -313,7 +235,7 @@
         <div class="footer-container">
             <!-- Footer Header -->
             <div class="footer-header">
-                <h2 class="footer-brand">Libreria Sitarello</h2>
+                <h2 class="footer-brand">SiwBooks</h2>
                 <p class="footer-tagline">Dove ogni libro racconta una storia e ogni storia trova il suo lettore</p>
             </div>
             
@@ -322,7 +244,7 @@
                 <!-- About Section -->
                 <div class="footer-section">
                     <h3><i class="fas fa-book-heart"></i>Chi Siamo</h3>
-                    <p>Libreria Sitarello è il punto di riferimento per gli amanti della lettura. Offriamo una vasta selezione di libri, dall'ultimo bestseller ai classici intramontabili.</p>
+                    <p>SiwBooks è il punto di riferimento per gli amanti della lettura. Offriamo una vasta selezione di libri, dall'ultimo bestseller ai classici intramontabili.</p>
                     <div class="social-links">
                         <a href="#" class="social-link" title="Facebook">
                             <i class="fab fa-facebook-f"></i>
@@ -366,7 +288,7 @@
                         </div>
                         <div class="contact-item">
                             <i class="fas fa-envelope"></i>
-                            <span>info@libreriasitarello.it</span>
+                            <span>info@siwbooks.it</span>
                         </div>
                         <div class="contact-item">
                             <i class="fas fa-clock"></i>
@@ -395,7 +317,7 @@
             <div class="footer-bottom">
                 <p>
                     <i class="fas fa-heart"></i>
-                    © 2024 Libreria Sitarello. Realizzato con passione per la lettura.
+                    © 2024 SiwBooks. Realizzato con passione per la lettura.
                 </p>
                 <ul class="footer-links">
                     <li><a href="#">Privacy Policy</a></li>

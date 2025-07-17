@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta th:if="${passwordTab}" name="passwordTab" content="true">
     <title>Il Tuo Profilo - Sitarello</title>
+    
+    <!-- Common Head -->
+    <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
+    
+    <!-- Page specific CSS -->
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/profile.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="animated-bg">
@@ -18,10 +22,9 @@
             <div class="shape"></div>
         </div>
     </div>
-    
-    <div th:insert="~{fragments/navbar :: navbar}"></div>
-    
-    <main class="container">
+
+    <!-- Navbar -->
+    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>    <main class="container">
         <div class="page-header">
             <h1 class="page-title">
                 <i class="fas fa-user-circle"></i>

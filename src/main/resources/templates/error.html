@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Errore - Gestione Prodotti</title>
+    
+    <!-- Common Head -->
+    <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
+    
+    <!-- Page specific CSS -->
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/error.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
 </head>
 <body>
-    <div th:insert="~{fragments/navbar :: navbar}"></div>
+    <!-- Navbar -->
+    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
     <main class="container">
         <h1>Errore</h1>
         <div class="error">
