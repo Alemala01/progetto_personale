@@ -119,6 +119,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Verifica se dobbiamo mostrare la tab delle impostazioni per errori di password
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasPasswordTab = document.querySelector('meta[name="passwordTab"]');
+    
+    if (hasPasswordTab || urlParams.get('passwordTab') === 'true') {
+        showTab('settings');
+    }
+    
     // Auto-hide alerts dopo 5 secondi
     document.querySelectorAll('.alert').forEach(alert => {
         setTimeout(() => {

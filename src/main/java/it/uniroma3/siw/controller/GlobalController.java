@@ -139,7 +139,7 @@ public class GlobalController {
             logger.info("Homepage model prepared: {} books, {} authors, {} categories", 
                        latestBooks.size(), popularAuthors.size(), categories.size());
 
-            return "index";
+            return "index-minimal";
 
         } catch (Exception e) {
             logger.error("Critical error loading homepage: {}", e.getMessage(), e);

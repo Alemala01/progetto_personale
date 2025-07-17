@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import it.uniroma3.siw.dto.AuthorFormDTO;
+import it.uniroma3.siw.dto.AuthorSearchDTO;
 import it.uniroma3.siw.model.Author;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.repository.AuthorRepository;
@@ -75,23 +76,172 @@ public class AuthorController {
         return user != null && "ADMIN".equals(user.getRole());
     }
     
-    // Visualizza tutti gli autori (pubblico)
+    // Visualizza tutti gli autori con possibilità di ricerca e filtri
     @GetMapping
-    public String showAllAuthors(Model model) {
+    public String showAllAuthors(@RequestParam(required = false) String nome,
+                                @RequestParam(required = false) String cognome,
+                                @RequestParam(required = false) String nazionalita,
+                                @RequestParam(required = false) Integer annoNascitaMin,
+                                @RequestParam(required = false) Integer annoNascitaMax,
+                                @RequestParam(required = false) Boolean soloVivi,
+                                @RequestParam(required = false) String sortBy,
+                                Model model) {
         try {
             addAuthenticationAttributes(model);
             
-            List<Author> authors = authorService.findAll();
+            // Crea il DTO di ricerca con i parametri ricevuti
+            AuthorSearchDTO searchDTO = new AuthorSearchDTO();
+            searchDTO.setSearchTerm(nome != null && !nome.trim().isEmpty() ? nome : 
+                                   (cognome != null && !cognome.trim().isEmpty() ? cognome : 
+                                    (nome != null && cognome != null && (!nome.trim().isEmpty() || !cognome.trim().isEmpty()) ? 
+                                     (nome.trim() + " " + cognome.trim()).trim() : null)));
+            searchDTO.setNazionalita(nazionalita);
+            searchDTO.setAnnoNascitaMin(annoNascitaMin);
+            searchDTO.setAnnoNascitaMax(annoNascitaMax);
+            searchDTO.setSoloVivi(soloVivi);
+            searchDTO.setSortBy(sortBy != null ? sortBy : "nome");
+            
+            List<Author> authors;
+            
+            // Se non ci sono filtri, carica tutti gli autori
+            if (!hasAnyFilter(nome, cognome, nazionalita, annoNascitaMin, annoNascitaMax, soloVivi)) {
+                authors = authorService.findAll();
+                logger.info("No filters applied, loaded all {} authors", authors.size());
+            } else {
+                // Applica i filtri di ricerca
+                authors = searchAuthorsWithFilters(nome, cognome, nazionalita, annoNascitaMin, annoNascitaMax, soloVivi);
+                logger.info("Applied filters, found {} authors", authors.size());
+            }
+            
+            // Ordinamento
+            sortAuthors(authors, searchDTO.getSortBy());
+            
+            // Crea un oggetto per il template che mantiene i valori separati
+            AuthorSearchFormDTO formDTO = new AuthorSearchFormDTO();
+            formDTO.setNome(nome);
+            formDTO.setCognome(cognome);
+            formDTO.setNazionalita(nazionalita);
+            formDTO.setAnnoNascitaMin(annoNascitaMin);
+            formDTO.setAnnoNascitaMax(annoNascitaMax);
+            formDTO.setSoloVivi(soloVivi);
+            formDTO.setSortBy(sortBy);
+            
             model.addAttribute("authors", authors);
             model.addAttribute("totalAuthors", authors.size());
+            model.addAttribute("authorSearchDTO", formDTO);
+            model.addAttribute("hasFilters", hasAnyFilter(nome, cognome, nazionalita, annoNascitaMin, annoNascitaMax, soloVivi));
             
-            logger.info("Loaded {} authors for public view", authors.size());
-            return "authors"; // Creeremo questo template
+            return "authors";
             
         } catch (Exception e) {
             logger.error("Error loading authors: {}", e.getMessage(), e);
             model.addAttribute("errorMessage", "Errore nel caricamento degli autori.");
             return "error";
+        }
+    }
+    
+    // Helper method per verificare se ci sono filtri attivi
+    private boolean hasAnyFilter(String nome, String cognome, String nazionalita, 
+                                Integer annoNascitaMin, Integer annoNascitaMax, Boolean soloVivi) {
+        return (nome != null && !nome.trim().isEmpty()) ||
+               (cognome != null && !cognome.trim().isEmpty()) ||
+               (nazionalita != null && !nazionalita.trim().isEmpty()) ||
+               (annoNascitaMin != null && annoNascitaMin > 0) ||
+               (annoNascitaMax != null && annoNascitaMax > 0) ||
+               (soloVivi != null && soloVivi);
+    }
+    
+    // Helper method per la ricerca con filtri
+    private List<Author> searchAuthorsWithFilters(String nome, String cognome, String nazionalita,
+                                                 Integer annoNascitaMin, Integer annoNascitaMax, Boolean soloVivi) {
+        List<Author> authors = authorService.findAll();
+        
+        return authors.stream()
+            .filter(author -> {
+                // Filtro per nome
+                if (nome != null && !nome.trim().isEmpty()) {
+                    if (author.getNome() == null || 
+                        !author.getNome().toLowerCase().contains(nome.trim().toLowerCase())) {
+                        return false;
+                    }
+                }
+                
+                // Filtro per cognome
+                if (cognome != null && !cognome.trim().isEmpty()) {
+                    if (author.getCognome() == null || 
+                        !author.getCognome().toLowerCase().contains(cognome.trim().toLowerCase())) {
+                        return false;
+                    }
+                }
+                
+                // Filtro per nazionalità
+                if (nazionalita != null && !nazionalita.trim().isEmpty()) {
+                    if (author.getNazionalita() == null || 
+                        !author.getNazionalita().toLowerCase().contains(nazionalita.trim().toLowerCase())) {
+                        return false;
+                    }
+                }
+                
+                // Filtro per anno nascita minimo
+                if (annoNascitaMin != null && annoNascitaMin > 0) {
+                    if (author.getDataNascita() == null || 
+                        author.getDataNascita().getYear() < annoNascitaMin) {
+                        return false;
+                    }
+                }
+                
+                // Filtro per anno nascita massimo
+                if (annoNascitaMax != null && annoNascitaMax > 0) {
+                    if (author.getDataNascita() == null || 
+                        author.getDataNascita().getYear() > annoNascitaMax) {
+                        return false;
+                    }
+                }
+                
+                // Filtro solo autori vivi
+                if (soloVivi != null && soloVivi) {
+                    if (author.getDataMorte() != null) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            })
+            .collect(java.util.stream.Collectors.toList());
+    }
+    
+    // Helper method per l'ordinamento
+    private void sortAuthors(List<Author> authors, String sortBy) {
+        if (sortBy == null) sortBy = "nome";
+        
+        switch (sortBy) {
+            case "cognome" -> authors.sort((a1, a2) -> {
+                String cognome1 = a1.getCognome() != null ? a1.getCognome() : "";
+                String cognome2 = a2.getCognome() != null ? a2.getCognome() : "";
+                return cognome1.compareToIgnoreCase(cognome2);
+            });
+            case "nazionalita" -> authors.sort((a1, a2) -> {
+                String naz1 = a1.getNazionalita() != null ? a1.getNazionalita() : "";
+                String naz2 = a2.getNazionalita() != null ? a2.getNazionalita() : "";
+                return naz1.compareToIgnoreCase(naz2);
+            });
+            case "anno_nascita" -> authors.sort((a1, a2) -> {
+                if (a1.getDataNascita() == null && a2.getDataNascita() == null) return 0;
+                if (a1.getDataNascita() == null) return 1;
+                if (a2.getDataNascita() == null) return -1;
+                return a1.getDataNascita().compareTo(a2.getDataNascita());
+            });
+            case "anno_nascita_desc" -> authors.sort((a1, a2) -> {
+                if (a1.getDataNascita() == null && a2.getDataNascita() == null) return 0;
+                if (a1.getDataNascita() == null) return 1;
+                if (a2.getDataNascita() == null) return -1;
+                return a2.getDataNascita().compareTo(a1.getDataNascita());
+            });
+            default -> authors.sort((a1, a2) -> { // nome
+                String nome1 = a1.getNome() != null ? a1.getNome() : "";
+                String nome2 = a2.getNome() != null ? a2.getNome() : "";
+                return nome1.compareToIgnoreCase(nome2);
+            });
         }
     }
     
@@ -395,5 +545,38 @@ public class AuthorController {
         public String getNazionalita() { return nazionalita; }
         public Integer getAnnoNascita() { return annoNascita; }
         public String getNomeCompleto() { return nome + " " + cognome; }
+    }
+    
+    // DTO per il form di ricerca (mantiene i campi separati)
+    public static class AuthorSearchFormDTO {
+        private String nome;
+        private String cognome;
+        private String nazionalita;
+        private Integer annoNascitaMin;
+        private Integer annoNascitaMax;
+        private Boolean soloVivi;
+        private String sortBy;
+        
+        // Getters and Setters
+        public String getNome() { return nome; }
+        public void setNome(String nome) { this.nome = nome; }
+        
+        public String getCognome() { return cognome; }
+        public void setCognome(String cognome) { this.cognome = cognome; }
+        
+        public String getNazionalita() { return nazionalita; }
+        public void setNazionalita(String nazionalita) { this.nazionalita = nazionalita; }
+        
+        public Integer getAnnoNascitaMin() { return annoNascitaMin; }
+        public void setAnnoNascitaMin(Integer annoNascitaMin) { this.annoNascitaMin = annoNascitaMin; }
+        
+        public Integer getAnnoNascitaMax() { return annoNascitaMax; }
+        public void setAnnoNascitaMax(Integer annoNascitaMax) { this.annoNascitaMax = annoNascitaMax; }
+        
+        public Boolean getSoloVivi() { return soloVivi; }
+        public void setSoloVivi(Boolean soloVivi) { this.soloVivi = soloVivi; }
+        
+        public String getSortBy() { return sortBy; }
+        public void setSortBy(String sortBy) { this.sortBy = sortBy; }
     }
 }

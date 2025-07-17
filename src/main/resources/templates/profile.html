@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta th:if="${passwordTab}" name="passwordTab" content="true">
     <title>Il Tuo Profilo - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/profile.css}" />
@@ -38,8 +39,8 @@
                     
                     <div class="profile-stats">
                         <div class="stat-item">
-                            <div class="stat-value">0</div>
-                            <div class="stat-label">Prodotti</div>
+                            <div class="stat-value" th:text="${totalReviews ?: 0}">0</div>
+                            <div class="stat-label">Recensioni</div>
                         </div>
                     </div>
                     
@@ -49,9 +50,8 @@
                 <div class="profile-card">
                     <ul class="profile-menu">
                         <li><a href="#dashboard" class="active" onclick="showTab('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                        <li><a th:href="@{/users/products}"><i class="fas fa-box-open"></i> I Miei Prodotti</a></li>
-                        <li><a href="#orders" onclick="showTab('orders')"><i class="fas fa-shopping-cart"></i> Acquisti</a></li>
-                        <li><a href="#payment" onclick="showTab('payment')"><i class="fas fa-credit-card"></i> Metodi di Pagamento</a></li>
+                        <li><a href="#reviews" onclick="showTab('reviews')"><i class="fas fa-star"></i> Le Mie Recensioni</a></li>
+                        <li><a href="#library" onclick="showTab('library')"><i class="fas fa-book"></i> Libri Preferiti</a></li>
                         <li><a href="#settings" onclick="showTab('settings')"><i class="fas fa-cog"></i> Impostazioni</a></li>
                     </ul>
                 </div>
@@ -99,8 +99,25 @@
                         </div>
                         
                         <div class="info-row">
-                            <div class="info-label">Prodotti:</div>
-                            <div class="info-value">0</div>
+                            <div class="info-label">Recensioni:</div>
+                            <div class="info-value" th:text="${totalReviews ?: 0}">0</div>
+                        </div>
+                        
+                        <div class="info-row" th:if="${totalReviews > 0}">
+                            <div class="info-label">Rating Medio:</div>
+                            <div class="info-value">
+                                <span th:text="${#numbers.formatDecimal(averageUserRating, 1, 1)}">0.0</span>
+                                <span class="rating-stars">
+                                    <span th:each="star : ${#numbers.sequence(1, 5)}">
+                                        <i th:class="${star <= averageUserRating ? 'fas fa-star' : 'far fa-star'}" style="color: #ffc107; font-size: 0.8rem;"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-row" th:if="${favoriteCategory != null and favoriteCategory != 'Nessuna'}">
+                            <div class="info-label">Categoria Preferita:</div>
+                            <div class="info-value" th:text="${favoriteCategory}">Categoria</div>
                         </div>
                         
                         <div class="action-btns">
@@ -114,24 +131,77 @@
                     </div>
                     
                     <div class="profile-section">
-                        <h3><i class="fas fa-box"></i> Prodotti Recenti</h3>
+                        <h3><i class="fas fa-star"></i> Le Tue Recensioni Recenti</h3>
                         
-                        <div class="empty-products">
-                            <p>Non hai ancora caricato nessun prodotto.</p>
-                            <a th:href="@{/product/create}" class="btn-edit-profile">
-                                <i class="fas fa-plus-circle"></i> Aggiungi Prodotto
-                            </a>
+                        <div th:if="${userReviews == null || userReviews.isEmpty()}" class="empty-reviews">
+                            <div class="empty-state">
+                                <i class="fas fa-star-o"></i>
+                                <p>Non hai ancora scritto nessuna recensione.</p>
+                                <p>Inizia a esplorare i libri e condividi le tue opinioni!</p>
+                                <a th:href="@{/products}" class="btn-edit-profile">
+                                    <i class="fas fa-book-open"></i> Esplora Libri
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div th:unless="${userReviews == null || userReviews.isEmpty()}" class="reviews-grid">
+                            <div th:each="review, iterStat : ${userReviews}" 
+                                 th:if="${iterStat.index < 3}"
+                                 class="review-card">
+                                <div class="review-header">
+                                    <div class="book-info">
+                                        <h4 th:text="${review.product.name}">Titolo del Libro</h4>
+                                        <div class="review-rating">
+                                            <span th:each="star : ${#numbers.sequence(1, 5)}">
+                                                <i th:class="${star <= review.value ? 'fas fa-star' : 'far fa-star'}" style="color: #ffc107;"></i>
+                                            </span>
+                                            <span th:text="${review.value} + '/5'" class="rating-value">5/5</span>
+                                        </div>
+                                    </div>
+                                    <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy')}">01/01/2024</div>
+                                </div>
+                                
+                                <h5 th:if="${review.titolo != null and !#strings.isEmpty(review.titolo)}" 
+                                    th:text="${review.titolo}" class="review-title">Titolo Recensione</h5>
+                                
+                                <p th:if="${review.comment != null and !#strings.isEmpty(review.comment)}" 
+                                   th:text="${#strings.abbreviate(review.comment, 120)}" class="review-excerpt">
+                                   Estratto della recensione...
+                                </p>
+                                
+                                <div class="review-actions">
+                                    <a th:href="@{'/product/details/' + ${review.product.id}}" class="btn-link">
+                                        <i class="fas fa-eye"></i> Vedi Libro
+                                    </a>
+                                    <a th:href="@{'/ratings/product/' + ${review.product.id}}" class="btn-link">
+                                        <i class="fas fa-edit"></i> Modifica
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Link per vedere tutte le recensioni se ce ne sono più di 3 -->
+                            <div th:if="${totalReviews > 3}" class="view-all-reviews">
+                                <a href="#reviews" onclick="showTab('reviews')" class="btn-edit-profile">
+                                    <i class="fas fa-list"></i> Vedi Tutte le Recensioni (${totalReviews})
+                                </a>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="profile-section">
-                        <h3><i class="fas fa-bolt"></i> Impostazioni Rapide</h3>
+                        <h3><i class="fas fa-bolt"></i> Azioni Rapide</h3>
                         
                         <div class="settings-section">
                             <div class="setting-card">
-                                <div class="setting-title"><i class="fas fa-box-open"></i> Aggiungi Nuovo Prodotto</div>
-                                <div class="setting-description">Carica un nuovo prodotto da vendere.</div>
-                                <a th:href="@{/product/create}" class="btn-edit-profile">Aggiungi</a>
+                                <div class="setting-title"><i class="fas fa-book-open"></i> Esplora Nuovi Libri</div>
+                                <div class="setting-description">Scopri la nostra collezione di libri.</div>
+                                <a th:href="@{/products}" class="btn-edit-profile">Esplora</a>
+                            </div>
+                            
+                            <div class="setting-card">
+                                <div class="setting-title"><i class="fas fa-users"></i> Scopri Autori</div>
+                                <div class="setting-description">Naviga tra gli autori della nostra libreria.</div>
+                                <a th:href="@{/authors}" class="btn-edit-profile">Autori</a>
                             </div>
                             
                             <div class="setting-card">
@@ -140,23 +210,72 @@
                                 <a href="#" class="btn-edit-profile" onclick="showTab('settings')">Cambia</a>
                             </div>
                             
-                            <div class="setting-card">
-                                <div class="setting-title"><i class="fas fa-envelope"></i> Gestisci Email</div>
-                                <div class="setting-description">Aggiorna il tuo indirizzo email.</div>
-                                <a href="#" class="btn-edit-profile" onclick="showTab('settings')">Gestisci</a>
+                            <!-- Pulsante solo per admin -->
+                            <div th:if="${user != null && user.role == 'ADMIN'}" class="setting-card">
+                                <div class="setting-title"><i class="fas fa-plus"></i> Aggiungi Libro</div>
+                                <div class="setting-description">Aggiungi un nuovo libro alla libreria.</div>
+                                <a th:href="@{/product/create}" class="btn-edit-profile">Aggiungi</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Sezione Ordini -->
-                <div id="orders" class="tab-content">
+                <!-- Sezione Recensioni -->
+                <div id="reviews" class="tab-content">
                     <div class="profile-section">
-                        <h3><i class="fas fa-shopping-bag"></i> I Tuoi Acquisti</h3>
+                        <h3><i class="fas fa-star"></i> Tutte le Tue Recensioni</h3>
+                        
+                        <div th:if="${userReviews != null and !userReviews.isEmpty()}">
+                            <div class="reviews-list">
+                                <div th:each="review : ${userReviews}" class="review-item">
+                                    <div class="review-book-info">
+                                        <h4 th:text="${review.product.titolo}">Titolo del Libro</h4>
+                                        <p class="review-author" th:text="${review.product.author.nome + ' ' + review.product.author.cognome}">Autore</p>
+                                    </div>
+                                    
+                                    <div class="review-rating">
+                                        <div class="stars">
+                                            <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                                  th:class="${i <= review.value} ? 'star filled' : 'star'"
+                                                  th:text="'★'">★</span>
+                                        </div>
+                                        <span class="rating-text" th:text="${review.value} + '/5'">5/5</span>
+                                    </div>
+                                    
+                                    <div class="review-content">
+                                        <p th:text="${review.comment}">Commento della recensione...</p>
+                                    </div>
+                                    
+                                    <div class="review-date">
+                                        <i class="fas fa-calendar"></i>
+                                        <span th:text="${#temporals.format(review.createdAt, 'dd MMMM yyyy')}">01 Gennaio 2024</span>
+                                    </div>
+                                    
+                                    <div class="review-actions">
+                                        <a th:href="@{/products/{id}(id=${review.product.id})}" class="btn-view-book">
+                                            <i class="fas fa-book"></i> Vedi Libro
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div th:if="${userReviews == null or userReviews.isEmpty()}" class="empty-section">
+                            <i class="fas fa-star fa-3x"></i>
+                            <p>Non hai ancora scritto nessuna recensione.</p>
+                            <a th:href="@{/products}" class="btn-edit-profile">Esplora Libri</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sezione Libreria -->
+                <div id="library" class="tab-content">
+                    <div class="profile-section">
+                        <h3><i class="fas fa-book"></i> La Tua Libreria Personale</h3>
                         <div class="empty-section">
-                            <i class="fas fa-shopping-cart fa-3x"></i>
-                            <p>Non hai ancora effettuato nessun acquisto.</p>
-                            <a th:href="@{/products}" class="btn-edit-profile">Esplora Prodotti</a>
+                            <i class="fas fa-bookmark fa-3x"></i>
+                            <p>Qui potrai salvare i tuoi libri preferiti.</p>
+                            <a th:href="@{/products}" class="btn-edit-profile">Scopri Libri</a>
                         </div>
                     </div>
                 </div>
@@ -227,21 +346,24 @@
                     <div class="profile-section">
                         <h3><i class="fas fa-lock"></i> Sicurezza</h3>
                         
-                        <form class="security-form" th:action="@{/users/change-password}" method="post">
+                        <form class="security-form" th:action="@{/users/change-password}" method="post" onsubmit="return validatePasswordForm()">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             
                             <div class="form-group">
                                 <label>Password Attuale</label>
-                                <input type="password" name="currentPassword" required minlength="8" />
+                                <input type="password" name="currentPassword" required minlength="8" 
+                                       placeholder="Inserisci la tua password attuale" />
                             </div>
                             <div class="form-group">
                                 <label>Nuova Password</label>
                                 <input type="password" name="newPassword" required minlength="8" 
+                                       placeholder="Almeno 8 caratteri, una maiuscola e un numero"
                                        title="La password deve contenere almeno 8 caratteri, una lettera maiuscola e un numero" />
                             </div>
                             <div class="form-group">
                                 <label>Conferma Nuova Password</label>
-                                <input type="password" name="confirmPassword" required minlength="8" />
+                                <input type="password" name="confirmPassword" required minlength="8" 
+                                       placeholder="Ripeti la nuova password" />
                             </div>
                             <button type="submit" class="btn-edit-profile">Cambia Password</button>
                         </form>

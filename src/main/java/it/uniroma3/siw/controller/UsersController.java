@@ -1,6 +1,8 @@
 package it.uniroma3.siw.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,8 +21,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import it.uniroma3.siw.dto.UsersDTO;
 import it.uniroma3.siw.model.Product;
+import it.uniroma3.siw.model.Rating;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.repository.ProductRepository;
+import it.uniroma3.siw.repository.RatingRepository;
 import it.uniroma3.siw.service.UsersService;
 import jakarta.validation.Valid;
 
@@ -32,6 +36,9 @@ public class UsersController {
     
     @Autowired
     private ProductRepository productRepository;
+    
+    @Autowired
+    private RatingRepository ratingRepository;
 
     private void addAuthenticationAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -89,6 +96,7 @@ public class UsersController {
     }
 
     @GetMapping("/profile")
+    @Transactional(readOnly = true)
     public String showProfilePage(Model model) {
         try {
             addAuthenticationAttributes(model);
@@ -105,6 +113,48 @@ public class UsersController {
                 
                 if (user != null) {
                     model.addAttribute("user", user);
+                    
+                    // Carica le recensioni dell'utente invece dei prodotti
+                    List<Rating> userReviews = ratingRepository.findByUser(user);
+                    // Ordina per data di creazione decrescente
+                    userReviews.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
+                    
+                    // Calcola statistiche delle recensioni
+                    int totalReviews = userReviews.size();
+                    double averageRating = 0.0;
+                    if (!userReviews.isEmpty()) {
+                        averageRating = userReviews.stream()
+                            .mapToInt(Rating::getValue)
+                            .average()
+                            .orElse(0.0);
+                    }
+                    
+                    // Trova i libri più recensiti dall'utente (conta le categorie più recensite)
+                    Map<String, Integer> categoryCounts = new HashMap<>();
+                    for (Rating review : userReviews) {
+                        Product book = review.getProduct();
+                        if (book.getCategory() != null) {
+                            String categoryName = book.getCategory().getName();
+                            categoryCounts.put(categoryName, categoryCounts.getOrDefault(categoryName, 0) + 1);
+                        }
+                    }
+                    
+                    // Trova la categoria più recensita
+                    String favoriteCategory = categoryCounts.entrySet().stream()
+                        .max(Map.Entry.comparingByValue())
+                        .map(Map.Entry::getKey)
+                        .orElse("Nessuna");
+                    
+                    // Prendi solo le ultime 6 recensioni per la dashboard
+                    List<Rating> recentReviews = userReviews.stream()
+                        .limit(6)
+                        .collect(java.util.stream.Collectors.toList());
+                    
+                    model.addAttribute("userReviews", recentReviews);
+                    model.addAttribute("totalReviews", totalReviews);
+                    model.addAttribute("averageUserRating", averageRating);
+                    model.addAttribute("favoriteCategory", favoriteCategory);
+                    model.addAttribute("allUserReviews", userReviews); // Per eventuali altre sezioni
                     
                     // Aggiungi gli attributi flash se presenti
                     if (model.containsAttribute("passwordSuccess")) {
