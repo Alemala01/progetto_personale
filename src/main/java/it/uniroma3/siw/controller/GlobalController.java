@@ -143,7 +143,7 @@ public class GlobalController {
             logger.debug("Homepage loaded with {} books, {} authors, {} categories", 
                         latestBooks.size(), popularAuthors.size(), categories.size());
 
-            return "index-minimal";  // Use minimal template to avoid errors
+            return "index";  // Return the main index template
 
         } catch (Exception e) {
             logger.error("Error loading homepage: {}", e.getMessage(), e);

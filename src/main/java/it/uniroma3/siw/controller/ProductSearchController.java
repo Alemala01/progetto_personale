@@ -73,7 +73,7 @@ public class ProductSearchController {
                     products = List.of(); // Lista vuota invece di null
                 }
                 // Carica manualmente le immagini per tutti i prodotti
-                loadImagesForProducts(products);
+                // loadImagesForProducts(products); // Temporaneamente disabilitato per debug
             } catch (Exception e) {
                 logger.warn("Errore nel caricamento dei prodotti: {}", e.getMessage());
                 products = List.of(); // Lista vuota in caso di errore
@@ -96,7 +96,6 @@ public class ProductSearchController {
             model.addAttribute("totalProducts", products.size());
             
             logger.info("Loaded {} products for public view", products.size());
-            logger.info("Products details: {}", products.stream().map(p -> "ID:" + p.getId() + " Name:" + p.getName()).toList());
             return "products-search";
             
         } catch (Exception e) {
@@ -226,36 +225,5 @@ public class ProductSearchController {
     @GetMapping("/reset")
     public String resetFilters(Model model) {
         return "redirect:/products";
-    }
-    
-    /**
-     * Endpoint di debug per verificare il passaggio dei prodotti
-     */
-    @GetMapping("/debug")
-    public String debugProducts(Model model) {
-        try {
-            addAuthenticationAttributes(model);
-            
-            List<Product> products = productRepository.findAll();
-            logger.info("DEBUG: Found {} products", products.size());
-            for (Product p : products) {
-                logger.info("DEBUG: Product ID={}, Name={}, Seller={}", 
-                    p.getId(), p.getName(), p.getSeller() != null ? p.getSeller().getUsername() : "NULL");
-            }
-            
-            List<Category> categories = (List<Category>) categoryRepository.findAll();
-            
-            model.addAttribute("products", products);
-            model.addAttribute("categories", categories);
-            model.addAttribute("searchDTO", new ProductSearchDTO());
-            model.addAttribute("totalProducts", products.size());
-            
-            return "products-debug";
-            
-        } catch (Exception e) {
-            logger.error("Error in debug: {}", e.getMessage(), e);
-            model.addAttribute("errorMessage", "Errore nel debug: " + e.getMessage());
-            return "error";
-        }
     }
 }

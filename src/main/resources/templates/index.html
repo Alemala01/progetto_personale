@@ -114,11 +114,11 @@
             </div>
             <div class="books-grid">
                 <div th:each="book : ${latestBooks}" class="book-card">
-                    <a th:href="@{'/product/details/' + ${book.id}}" style="text-decoration: none; color: inherit;">
+                    <a th:href="@{/product/details/{id}(id=${book.id})}" style="text-decoration: none; color: inherit;">
                         <div class="book-cover">
                             <div th:if="${book.images != null && !book.images.isEmpty()}" class="book-image">
-                                <img th:src="@{'/product/image/' + ${book.images[0].id}}" 
-                                     th:alt="${book.titolo}" 
+                                <img th:src="@{/product/image/{imageId}(imageId=${book.images[0].id})}" 
+                                     th:alt="${book.name}" 
                                      class="book-img-fallback">
                                 <div class="book-placeholder" style="display: none;">
                                     <i class="fas fa-book"></i>
@@ -129,10 +129,15 @@
                             </div>
                         </div>
                         <div class="book-info">
-                            <h3 class="book-title" th:text="${book.titolo}">Titolo del Libro</h3>
+                            <h3 class="book-title" th:text="${book.name}">Titolo del Libro</h3>
                             <p class="book-authors" th:if="${book.autori != null && !book.autori.isEmpty()}">
                                 <i class="fas fa-user-pen"></i>
-                                <span th:text="${book.getAutoriNames()}">Autori</span>
+                                <span>
+                                    <span th:each="author, iterStat : ${book.autori}">
+                                        <span th:text="${author.nome + ' ' + author.cognome}">Autore</span>
+                                        <span th:if="${!iterStat.last}">, </span>
+                                    </span>
+                                </span>
                             </p>
                             <p class="book-year" th:if="${book.annoPubblicazione != null}">
                                 <i class="fas fa-calendar"></i>

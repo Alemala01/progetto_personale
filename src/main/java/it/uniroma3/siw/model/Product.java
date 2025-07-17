@@ -120,6 +120,11 @@ public class Product {
                 .orElse("Autore sconosciuto");
     }
     
+    // Alias method for templates that expect getAutoriNames()
+    public String getAutoriNames() {
+        return getAutoriNomi();
+    }
+    
     public boolean hasAutore(Author autore) {
         return this.autori != null && this.autori.contains(autore);
     }
