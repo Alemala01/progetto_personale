@@ -33,7 +33,7 @@
         
         <form id="imageForm" th:action="@{/product/edit/images}" method="post" enctype="multipart/form-data">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <p class="info">Carica da 2 a 10 nuove immagini per sostituire quelle attuali.</p>
+            <p class="info">Carica da 1 a 10 nuove immagini per sostituire quelle attuali.</p>
             <p class="warning"><strong>Attenzione:</strong> Le immagini attuali verranno completamente sostituite con quelle che carichi.</p>
             <input type="file" id="images" name="images" accept="image/*" multiple required
                    onchange="validateImages(this)" />

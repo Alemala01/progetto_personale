@@ -9,9 +9,9 @@
     <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
     
     <!-- Page specific CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/author-form.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/minimal-homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/author-form-minimal.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer-minimal.css}" />
 </head>
 <body>
     <!-- Navbar -->
@@ -167,7 +167,7 @@
                                id="dataNascita" 
                                th:field="*{dataNascita}"
                                class="form-input"
-                               max="2024-12-31">
+                               th:max="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
                         <div th:if="${#fields.hasErrors('dataNascita')}" class="error-message">
                             <i class="fas fa-exclamation-circle"></i>
                             <span th:errors="*{dataNascita}">Errore data nascita</span>
@@ -183,7 +183,7 @@
                                id="dataMorte" 
                                th:field="*{dataMorte}"
                                class="form-input"
-                               max="2024-12-31">
+                               th:max="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
                         <div th:if="${#fields.hasErrors('dataMorte')}" class="error-message">
                             <i class="fas fa-exclamation-circle"></i>
                             <span th:errors="*{dataMorte}">Errore data morte</span>
@@ -282,7 +282,7 @@
         </div>
     </main>
 
-    <div th:insert="~{fragments/footer :: footer}"></div>
+    <div th:insert="~{fragments/footer-minimal :: footer-minimal}"></div>
     
     <script th:src="@{/js/author-form.js}"></script>
 </body>

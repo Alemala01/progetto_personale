@@ -33,6 +33,7 @@ import it.uniroma3.siw.model.Author;
 import it.uniroma3.siw.model.Category;
 import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.ProductImage;
+import it.uniroma3.siw.model.Rating;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.repository.AuthorRepository;
 import it.uniroma3.siw.repository.CategoryRepository;
@@ -359,8 +360,8 @@ public class ProductController {
                 return "error";
             }
 
-            if (images.size() < 2 || images.size() > 10) {
-                model.addAttribute("errorMessage", "Seleziona da 2 a 10 immagini.");
+            if (images.size() < 1 || images.size() > 10) {
+                model.addAttribute("errorMessage", "Seleziona da 1 a 10 immagini.");
                 model.addAttribute("product", product);
                 return "edit-images";
             }
@@ -535,6 +536,13 @@ public class ProductController {
                 
                 model.addAttribute("averageRating", avgRating);
                 model.addAttribute("ratingCount", ratingCount);
+                
+                // Aggiungi le recensioni per l'anteprima nella pagina del prodotto
+                List<Rating> ratings = new ArrayList<>(product.getRatings());
+                // Ordina le recensioni per data (più recenti prima)
+                ratings.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
+                model.addAttribute("ratings", ratings);
+                
             } catch (Exception e) {
                 // Fallback se c'è un problema con i rating
                 logger.warn("Impossibile caricare i rating: {}", e.getMessage());

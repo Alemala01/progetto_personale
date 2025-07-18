@@ -11,8 +11,8 @@ function validateImages(input) {
     
     imageCount.textContent = 'Immagini selezionate: ' + files.length;
     
-    if (files.length < 2 || files.length > 10) {
-        errorMessage.textContent = 'Seleziona da 2 a 10 immagini.';
+    if (files.length < 1 || files.length > 10) {
+        errorMessage.textContent = 'Seleziona da 1 a 10 immagini.';
         submitButton.disabled = true;
         return;
     }

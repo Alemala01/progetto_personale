@@ -10,21 +10,15 @@
     <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
     
     <!-- Page specific CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/profile.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/minimal-homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/profile-minimal.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer-minimal.css}" />
 </head>
 <body>
-    <div class="animated-bg">
-        <div class="floating-shapes">
-            <div class="shape"></div>
-            <div class="shape"></div>
-            <div class="shape"></div>
-        </div>
-    </div>
-
     <!-- Navbar -->
-    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>    <main class="container">
+    <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
+
+    <main class="container">
         <div class="page-header">
             <h1 class="page-title">
                 <i class="fas fa-user-circle"></i>
@@ -416,7 +410,7 @@
     </main>
     
     <!-- Include footer fragment -->
-    <div th:insert="~{fragments/footer :: footer}"></div>
+    <div th:insert="~{fragments/footer-minimal :: footer-minimal}"></div>
     
     <script th:src="@{/js/profile.js}"></script>
 </body>

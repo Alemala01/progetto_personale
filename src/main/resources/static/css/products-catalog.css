@@ -214,7 +214,7 @@
 /* Immagine prodotto */
 .product-image {
     width: 100%;
-    height: 220px;
+    height: 320px; /* Aumentata da 220px a 320px per un formato più verticale */
     border-radius: var(--border-radius);
     overflow: hidden;
     margin-bottom: var(--space-md);
@@ -652,7 +652,7 @@
     }
     
     .product-image {
-        height: 180px;
+        height: 280px; /* Aumentata da 180px a 280px per mantenere proporzioni su mobile */
     }
     
     .product-name {

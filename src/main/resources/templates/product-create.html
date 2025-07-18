@@ -11,24 +11,16 @@
     <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
     
     <!-- Page specific CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/product-create.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/minimal-homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/product-create-minimal.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer-minimal.css}" />
     <meta name="description" content="Aggiungi un nuovo libro alla Libreria Sitarello">
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="animated-bg"></div>
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-
     <!-- Navbar -->
     <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
 
-    <main class="product-create-container">
+    <main class="product-create-container container">
         <!-- Header Section -->
         <div class="page-header">
             <div class="header-content">
@@ -503,7 +495,7 @@
         </div>
     </main>
 
-    <div th:insert="~{fragments/footer :: footer}"></div>
+    <div th:insert="~{fragments/footer-minimal :: footer-minimal}"></div>
 
     <script th:src="@{/js/product-create.js}"></script>
 </body>

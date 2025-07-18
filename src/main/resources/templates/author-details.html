@@ -9,9 +9,9 @@
     <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
     
     <!-- Page specific CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/author-details.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/minimal-homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/author-details-minimal.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer-minimal.css}" />
 </head>
 <body>
     <!-- Navbar -->
@@ -205,8 +205,6 @@
         </div>
     </main>
 
-    <div th:insert="~{fragments/footer :: footer}"></div>
-    
-    <script th:src="@{/js/author-details.js}"></script>
+    <div th:insert="~{fragments/footer-minimal :: footer-minimal}"></div>
 </body>
 </html>

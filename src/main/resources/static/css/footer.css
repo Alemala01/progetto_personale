@@ -1,15 +1,16 @@
-/* ========== FOOTER GLOBAL STYLES ========== */
+/* ========== FOOTER MINIMAL STYLES ========== */
 .footer {
     background: linear-gradient(135deg, 
-        rgba(30, 41, 59, 0.98) 0%,
-        rgba(51, 65, 85, 0.95) 50%,
-        rgba(30, 41, 59, 0.98) 100%);
+        rgba(245, 242, 236, 0.95) 0%,
+        rgba(250, 248, 245, 0.98) 50%,
+        rgba(245, 242, 236, 0.95) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(139, 92, 246, 0.2);
+    border-top: 1px solid rgba(212, 165, 116, 0.2);
     position: relative;
     overflow: hidden;
     margin-top: 80px;
+    color: #2c3e50;
 }
 
 .footer::before {
@@ -20,9 +21,9 @@
     right: 0;
     bottom: 0;
     background: 
-        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 60%, rgba(34, 197, 94, 0.05) 0%, transparent 50%);
+        radial-gradient(circle at 20% 20%, rgba(212, 165, 116, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(156, 175, 136, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(212, 165, 116, 0.05) 0%, transparent 50%);
     pointer-events: none;
 }
 
@@ -42,31 +43,51 @@
 }
 
 .footer-logo h3 {
-    color: #fff;
+    color: #2c3e50;
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 15px;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, #d4a574, #c9955a);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+    text-shadow: 0 4px 20px rgba(212, 165, 116, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-logo h3 i {
+    background: linear-gradient(135deg, #d4a574, #c9955a);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .footer-logo p {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(44, 62, 80, 0.8);
     font-size: 1rem;
     line-height: 1.6;
     margin: 0;
+    font-style: italic;
 }
 
 .footer-links h4 {
-    color: #fff;
+    color: #2c3e50;
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 20px;
     position: relative;
     padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Playfair Display', serif;
+}
+
+.footer-links h4 i {
+    color: #d4a574;
 }
 
 .footer-links h4::after {
@@ -76,7 +97,7 @@
     left: 0;
     width: 30px;
     height: 2px;
-    background: linear-gradient(90deg, #8b5cf6, #ec4899);
+    background: linear-gradient(90deg, #d4a574, #c9955a);
     border-radius: 2px;
 }
 
@@ -91,28 +112,29 @@
 }
 
 .footer-links ul li a {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(44, 62, 80, 0.7);
     text-decoration: none;
     font-size: 0.95rem;
     transition: all 0.3s ease;
     position: relative;
     padding-left: 15px;
+    font-weight: 500;
 }
 
 .footer-links ul li a::before {
     content: '→';
     position: absolute;
     left: 0;
-    color: #8b5cf6;
+    color: #d4a574;
     opacity: 0;
     transform: translateX(-10px);
     transition: all 0.3s ease;
 }
 
 .footer-links ul li a:hover {
-    color: #fff;
+    color: #2c3e50;
     transform: translateX(5px);
-    text-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+    text-shadow: 0 2px 10px rgba(212, 165, 116, 0.4);
 }
 
 .footer-links ul li a:hover::before {
@@ -121,8 +143,11 @@
 }
 
 .footer-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(212, 165, 116, 0.2);
     padding-top: 30px;
+}
+
+.footer-bottom-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -131,9 +156,10 @@
 }
 
 .footer-bottom p {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(44, 62, 80, 0.6);
     font-size: 0.9rem;
     margin: 0;
+    font-weight: 500;
 }
 
 .social-icons {
@@ -145,14 +171,14 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(212, 165, 116, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(212, 165, 116, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(44, 62, 80, 0.6);
     font-size: 1.2rem;
     transition: all 0.3s ease;
     text-decoration: none;
@@ -167,7 +193,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    background: linear-gradient(135deg, #d4a574, #c9955a);
     opacity: 0;
     transition: all 0.3s ease;
     border-radius: 50%;
@@ -175,7 +201,7 @@
 
 .social-icons a:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 10px 30px rgba(212, 165, 116, 0.4);
     color: #fff;
 }
 
@@ -215,10 +241,12 @@
     
     .footer-logo h3 {
         font-size: 1.8rem;
+        justify-content: center;
     }
     
     .footer-links h4 {
         font-size: 1.05rem;
+        justify-content: center;
     }
     
     .footer-links h4::after {
@@ -226,7 +254,7 @@
         transform: translateX(-50%);
     }
     
-    .footer-bottom {
+    .footer-bottom-content {
         flex-direction: column;
         text-align: center;
         gap: 15px;
@@ -282,6 +310,7 @@
 .footer-links ul li:nth-child(1) { animation-delay: 0.1s; }
 .footer-links ul li:nth-child(2) { animation-delay: 0.2s; }
 .footer-links ul li:nth-child(3) { animation-delay: 0.3s; }
+.footer-links ul li:nth-child(4) { animation-delay: 0.4s; }
 
 @keyframes footerSlideIn {
     from {
@@ -302,6 +331,7 @@
 .social-icons a:nth-child(1) { animation-delay: 0.1s; }
 .social-icons a:nth-child(2) { animation-delay: 0.2s; }
 .social-icons a:nth-child(3) { animation-delay: 0.3s; }
+.social-icons a:nth-child(4) { animation-delay: 0.4s; }
 
 @keyframes socialIconPop {
     from {

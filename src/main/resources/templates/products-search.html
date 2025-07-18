@@ -11,7 +11,8 @@
     <!-- Page specific CSS -->
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/products-catalog.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/products-search-pagination.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer-minimal.css}" />
     <meta name="description" content="Scopri tutti i libri disponibili su Sitarello">
 </head>
 <body class="products-page">
@@ -147,8 +148,9 @@
         </div>
         
         <!-- Products Grid -->
-        <div th:if="${products != null && !products.isEmpty()}" class="products-grid">
-            <div th:each="product : ${products}" class="product-card">
+        <div th:if="${products != null && !products.isEmpty()}" class="products-container">
+            <div class="products-grid" id="products-grid">
+                <div th:each="product : ${products}" class="product-card" th:attr="data-index=${productStat.index}">
                 <!-- Product Image -->
                 <div class="product-image">
                     <div th:if="${product.images != null && !product.images.isEmpty()}">
@@ -217,29 +219,29 @@
                     </span>
                 </div>
                 
-                <!-- Product Seller -->
-                <div class="product-seller">
-                    <i class="fas fa-user"></i>
-                    <span>Venditore:</span>
-                    <a th:href="@{/users/seller/{username}(username=${product.seller.username})}" th:text="${product.seller.username}">
-                        Nome Venditore
-                    </a>
-                </div>
-                
                 <!-- Product Actions -->
                 <div class="product-actions">
                     <a th:href="@{/product/details/{id}(id=${product.id})}" class="btn btn-primary">
                         <i class="fas fa-eye"></i> Visualizza
                     </a>
                     
-                    <!-- Pulsante di modifica solo se l'utente è autenticato e proprietario del prodotto -->
-                    <a th:if="${isAuthenticated and product.seller.username == username}" 
+                    <!-- Pulsante di modifica per tutti gli admin -->
+                    <a th:if="${isAuthenticated}" 
+                       sec:authorize="hasRole('ADMIN')"
                        th:href="@{/product/edit/{id}(id=${product.id})}" 
                        class="btn btn-outline">
                         <i class="fas fa-edit"></i> Modifica
                     </a>
                 </div>
             </div>
+        </div>
+        
+        <!-- Show More Button (outside the grid) -->
+        <div th:if="${products != null && !products.isEmpty()}" class="show-more-container" id="show-more-container">
+            <button class="btn btn-outline show-more-btn" id="show-more-btn">
+                <i class="fas fa-chevron-down"></i>
+                Mostra di più
+            </button>
         </div>
         
         <!-- Empty State -->
@@ -267,15 +269,68 @@
                 <i class="fas fa-arrow-left"></i> 
                 Torna alla Home
             </a>
-            <a th:href="@{/product/create}" class="btn btn-primary" sec:authorize="isAuthenticated()">
-                <i class="fas fa-plus"></i> 
-                Aggiungi Libro
-            </a>
         </div>
     </main>
     
     <!-- Include footer fragment -->
-    <div th:insert="~{fragments/footer :: footer}"></div>
+    <div th:insert="~{fragments/footer-minimal :: footer-minimal}"></div>
+    
+    <!-- Pagination Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const productsGrid = document.getElementById('products-grid');
+            const showMoreBtn = document.getElementById('show-more-btn');
+            const showMoreContainer = document.getElementById('show-more-container');
+            
+            if (!productsGrid || !showMoreBtn) return;
+            
+            const productCards = productsGrid.querySelectorAll('.product-card');
+            const itemsPerPage = 12;
+            let currentlyShown = 0;
+            
+            function showProducts(count) {
+                const nextItems = Math.min(count, productCards.length - currentlyShown);
+                
+                for (let i = currentlyShown; i < currentlyShown + nextItems; i++) {
+                    if (productCards[i]) {
+                        productCards[i].style.display = 'block';
+                    }
+                }
+                
+                currentlyShown += nextItems;
+                
+                // Hide show more button if all products are shown
+                if (currentlyShown >= productCards.length) {
+                    showMoreContainer.style.display = 'none';
+                }
+            }
+            
+            function hideAllProducts() {
+                productCards.forEach(card => {
+                    card.style.display = 'none';
+                });
+            }
+            
+            // Initialize pagination
+            if (productCards.length > 0) {
+                hideAllProducts();
+                // Show first 12 products
+                showProducts(itemsPerPage);
+                
+                // Show the "Show More" button only if there are more than 12 products
+                if (productCards.length > itemsPerPage) {
+                    showMoreContainer.style.display = 'block';
+                } else {
+                    showMoreContainer.style.display = 'none';
+                }
+            }
+            
+            // Show more button click handler - shows 12 more products each time
+            showMoreBtn.addEventListener('click', function() {
+                showProducts(itemsPerPage);
+            });
+        });
+    </script>
 </body>
 </html>
 

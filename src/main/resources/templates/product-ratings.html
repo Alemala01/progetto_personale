@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${product.name + ' - Recensioni - Sitarello'}">Recensioni del Prodotto - Sitarello</title>
+    <title th:text="${product.name + ' - Recensioni - SiwBooks'}">Recensioni del Prodotto - SiwBooks</title>
     
     <!-- Common Head -->
     <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
     
     <!-- Page specific CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/product-ratings.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/minimal-homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/product-ratings-minimal.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer-minimal.css}" />
 </head>
 <body>
     <!-- Navbar -->
@@ -248,7 +248,7 @@
         </div>
     </main>
     
-    <div th:insert="~{fragments/footer :: footer}"></div>
+    <div th:insert="~{fragments/footer-minimal :: footer-minimal}"></div>
     
     <script>
         // Rating system functionality

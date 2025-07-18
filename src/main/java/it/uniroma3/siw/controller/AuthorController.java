@@ -380,6 +380,11 @@ public class AuthorController {
             
             Author author = authorOpt.get();
             
+            // Log per debug
+            logger.info("Loading author for edit: ID={}, Nome={}, Cognome={}, DataNascita={}, DataMorte={}", 
+                       author.getId(), author.getNome(), author.getCognome(), 
+                       author.getDataNascita(), author.getDataMorte());
+            
             // Crea il DTO dall'autore esistente
             AuthorFormDTO authorFormDTO = new AuthorFormDTO();
             authorFormDTO.setNome(author.getNome());
@@ -389,10 +394,15 @@ public class AuthorController {
             authorFormDTO.setNazionalita(author.getNazionalita());
             authorFormDTO.setBiografia(author.getBiografia());
             
+            // Log per debug del DTO
+            logger.info("Created AuthorFormDTO: Nome={}, Cognome={}, DataNascita={}, DataMorte={}", 
+                       authorFormDTO.getNome(), authorFormDTO.getCognome(), 
+                       authorFormDTO.getDataNascita(), authorFormDTO.getDataMorte());
+            
             model.addAttribute("authorFormDTO", authorFormDTO);
             model.addAttribute("author", author);
             
-            return "author-edit"; // Creeremo questo template
+            return "author-form"; // Usa il template esistente che gestisce sia creazione che modifica
             
         } catch (Exception e) {
             logger.error("Error loading author for edit: {}", e.getMessage(), e);
@@ -422,18 +432,35 @@ public class AuthorController {
             
             if (result.hasErrors()) {
                 model.addAttribute("author", authorOpt.get());
-                return "author-edit";
+                return "author-form";
             }
             
             Author author = authorOpt.get();
             
-            // Aggiorna i dati dell'autore
+            // Log dei valori ricevuti dal form
+            logger.info("Values received from form: DataNascita={}, DataMorte={}, Nazionalita='{}', Biografia='{}'", 
+                       authorFormDTO.getDataNascita(), authorFormDTO.getDataMorte(), 
+                       authorFormDTO.getNazionalita(), authorFormDTO.getBiografia());
+            
+            // Aggiorna i dati dell'autore - mantieni i valori precedenti se i campi sono vuoti
             author.setNome(authorFormDTO.getNome());
             author.setCognome(authorFormDTO.getCognome());
-            author.setDataNascita(authorFormDTO.getDataNascita());
-            author.setDataMorte(authorFormDTO.getDataMorte());
-            author.setNazionalita(authorFormDTO.getNazionalita());
-            author.setBiografia(authorFormDTO.getBiografia());
+            
+            // Mantieni le date precedenti se non sono state modificate (se sono null nel DTO)
+            if (authorFormDTO.getDataNascita() != null) {
+                author.setDataNascita(authorFormDTO.getDataNascita());
+            }
+            if (authorFormDTO.getDataMorte() != null) {
+                author.setDataMorte(authorFormDTO.getDataMorte());
+            }
+            
+            // Mantieni nazionalità e biografia precedenti se vuote
+            if (authorFormDTO.getNazionalita() != null && !authorFormDTO.getNazionalita().trim().isEmpty()) {
+                author.setNazionalita(authorFormDTO.getNazionalita());
+            }
+            if (authorFormDTO.getBiografia() != null && !authorFormDTO.getBiografia().trim().isEmpty()) {
+                author.setBiografia(authorFormDTO.getBiografia());
+            }
             
             // Salva l'autore con la nuova fotografia se presente
             Author updatedAuthor = authorService.updateAuthorWithPhoto(author, authorFormDTO.getFotografia());
@@ -444,11 +471,11 @@ public class AuthorController {
         } catch (IOException e) {
             logger.error("Error updating author photo: {}", e.getMessage(), e);
             model.addAttribute("errorMessage", "Errore durante l'aggiornamento della fotografia.");
-            return "author-edit";
+            return "author-form";
         } catch (Exception e) {
             logger.error("Error updating author: {}", e.getMessage(), e);
             model.addAttribute("errorMessage", "Errore durante l'aggiornamento dell'autore: " + e.getMessage());
-            return "author-edit";
+            return "author-form";
         }
     }
     

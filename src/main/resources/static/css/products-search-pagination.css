@@ -1,0 +1,253 @@
+/* Products Search Pagination Styles */
+
+.products-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.product-card {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #e8e6e1;
+    display: none; /* Hidden by default for pagination */
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.show-more-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px auto;
+    width: 100%;
+    max-width: 1200px;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.show-more-btn {
+    background: #ffffff;
+    border: 2px solid #d4a574;
+    color: #d4a574;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(212, 165, 116, 0.2);
+}
+
+.show-more-btn:hover {
+    background: #d4a574;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 165, 116, 0.3);
+}
+
+.show-more-btn i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.show-more-btn:hover i {
+    transform: translateY(2px);
+}
+
+/* Product Card Styles */
+.product-image {
+    text-align: center;
+    margin-bottom: 20px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f6f3;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.product-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #d4a574;
+    font-size: 3rem;
+}
+
+.product-header {
+    margin-bottom: 15px;
+}
+
+.product-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+}
+
+.product-description {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-meta {
+    margin-bottom: 20px;
+}
+
+.product-info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 100px;
+}
+
+.info-label i {
+    color: #d4a574;
+    font-size: 0.85rem;
+}
+
+.info-value {
+    color: #7f8c8d;
+    flex: 1;
+}
+
+.product-ratings {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.rating-stars i {
+    color: #f39c12;
+    font-size: 0.9rem;
+}
+
+.rating-text {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.product-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.product-actions .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.product-actions .btn-primary {
+    background: #d4a574;
+    color: #ffffff;
+    border: none;
+}
+
+.product-actions .btn-primary:hover {
+    background: #c49963;
+    transform: translateY(-2px);
+}
+
+.product-actions .btn-outline {
+    background: transparent;
+    color: #d4a574;
+    border: 2px solid #d4a574;
+}
+
+.product-actions .btn-outline:hover {
+    background: #d4a574;
+    color: #ffffff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .product-card {
+        padding: 20px;
+    }
+    
+    .product-name {
+        font-size: 1.2rem;
+    }
+    
+    .product-actions {
+        flex-direction: column;
+    }
+    
+    .product-actions .btn {
+        min-width: auto;
+    }
+    
+    .show-more-btn {
+        padding: 12px 25px;
+        font-size: 0.9rem;
+    }
+}

@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
 
 public class AuthorFormDTO {
     
@@ -15,13 +14,10 @@ public class AuthorFormDTO {
     @NotBlank(message = "Il cognome è obbligatorio")
     private String cognome;
 
-    @Past(message = "La data di nascita deve essere nel passato")
     private LocalDate dataNascita;
 
-    @Past(message = "La data di morte deve essere nel passato")
     private LocalDate dataMorte; // Opzionale
 
-    @NotBlank(message = "La nazionalità è obbligatoria")
     private String nazionalita;
 
     private String biografia; // Biografia dell'autore
