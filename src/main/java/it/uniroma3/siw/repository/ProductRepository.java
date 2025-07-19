@@ -49,32 +49,36 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Rating> findRatingsForProduct(@Param("productId") Long productId);
     
     // Search and filter queries for books (updated for library system)
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images LEFT JOIN p.autori a " +
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images LEFT JOIN p.autori a LEFT JOIN p.ratings r " +
            "WHERE (:searchTerm = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:category IS NULL OR p.category = :category) " +
            "AND (:autore = '' OR LOWER(CONCAT(a.nome, ' ', a.cognome)) LIKE LOWER(CONCAT('%', :autore, '%'))) " +
            "AND (:annoMin IS NULL OR p.annoPubblicazione >= :annoMin) " +
-           "AND (:annoMax IS NULL OR p.annoPubblicazione <= :annoMax)")
+           "AND (:annoMax IS NULL OR p.annoPubblicazione <= :annoMax) " +
+           "AND (:ratingMin IS NULL OR (SELECT AVG(rt.value) FROM Rating rt WHERE rt.product = p) >= :ratingMin)")
     List<Product> findProductsWithFilters(@Param("searchTerm") String searchTerm,
                                          @Param("category") Category category,
                                          @Param("autore") String autore,
                                          @Param("annoMin") Year annoMin,
-                                         @Param("annoMax") Year annoMax);
+                                         @Param("annoMax") Year annoMax,
+                                         @Param("ratingMin") Integer ratingMin);
     
     // Search with pagination for books
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images LEFT JOIN p.autori a " +
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images LEFT JOIN p.autori a LEFT JOIN p.ratings r " +
            "WHERE (:searchTerm = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:category IS NULL OR p.category = :category) " +
            "AND (:autore = '' OR LOWER(CONCAT(a.nome, ' ', a.cognome)) LIKE LOWER(CONCAT('%', :autore, '%'))) " +
            "AND (:annoMin IS NULL OR p.annoPubblicazione >= :annoMin) " +
-           "AND (:annoMax IS NULL OR p.annoPubblicazione <= :annoMax)")
+           "AND (:annoMax IS NULL OR p.annoPubblicazione <= :annoMax) " +
+           "AND (:ratingMin IS NULL OR (SELECT AVG(rt.value) FROM Rating rt WHERE rt.product = p) >= :ratingMin)")
     Page<Product> findProductsWithFiltersPageable(@Param("searchTerm") String searchTerm,
                                                  @Param("category") Category category,
                                                  @Param("autore") String autore,
                                                  @Param("annoMin") Year annoMin,
                                                  @Param("annoMax") Year annoMax,
+                                                 @Param("ratingMin") Integer ratingMin,
                                                  Pageable pageable);
     
     // Additional queries for books

@@ -37,10 +37,59 @@ public class SavedBookController {
     @Autowired
     private ProductRepository productRepository;
     
+    @GetMapping("/test")
+    @ResponseBody
+    public String testEndpoint() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return "Test endpoint working. User: " + (auth != null ? auth.getName() : "null") + 
+               ", Role: " + (auth != null ? auth.getAuthorities() : "null");
+    }
+    
+    @GetMapping("/debug")
+    public String debugSavedBooks(Model model) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = auth.getName();
+            Users user = usersService.findByUsername(username);
+            
+            List<Product> savedProducts = savedBookService.getUserSavedProducts(user);
+            long totalSavedBooks = savedBookService.countUserSavedBooks(user);
+            
+            model.addAttribute("savedProducts", savedProducts);
+            model.addAttribute("totalSavedBooks", totalSavedBooks);
+            model.addAttribute("user", user);
+            
+            logger.info("DEBUG: User: {}, Role: {}, Saved count: {}", 
+                       user.getUsername(), user.getRole(), savedProducts.size());
+            
+            return "saved-books-debug";
+            
+        } catch (Exception e) {
+            logger.error("Error in debug endpoint", e);
+            return "error";
+        }
+    }
+    
+    @GetMapping("/minimal")
+    public String minimalTest(Model model) {
+        logger.info("MINIMAL TEST CALLED");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        
+        model.addAttribute("username", username);
+        model.addAttribute("message", "Minimal test working for admin");
+        
+        return "saved-books-minimal";
+    }
+    
     @GetMapping
     public String savedBooks(Model model) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            
+            logger.info("Authentication object: {}", auth);
+            logger.info("Is authenticated: {}", auth != null ? auth.isAuthenticated() : "null");
+            logger.info("Principal: {}", auth != null ? auth.getPrincipal() : "null");
             
             if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
                 logger.warn("User not authenticated, redirecting to login");
@@ -48,7 +97,10 @@ public class SavedBookController {
             }
             
             String username = auth.getName();
+            logger.info("Username from auth: {}", username);
+            
             Users user = usersService.findByUsername(username);
+            logger.info("User found: {}, Role: {}", user != null ? user.getUsername() : "null", user != null ? user.getRole() : "null");
             
             if (user == null) {
                 logger.error("User not found: {}", username);
@@ -57,6 +109,8 @@ public class SavedBookController {
             
             List<Product> savedProducts = savedBookService.getUserSavedProducts(user);
             long totalSavedBooks = savedBookService.countUserSavedBooks(user);
+            
+            logger.info("Saved products count: {}, Total saved books: {}", savedProducts.size(), totalSavedBooks);
             
             model.addAttribute("savedProducts", savedProducts);
             model.addAttribute("totalSavedBooks", totalSavedBooks);

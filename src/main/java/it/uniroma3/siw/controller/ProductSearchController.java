@@ -132,7 +132,8 @@ public class ProductSearchController {
             List<Product> products = productRepository.findProductsWithFilters(
                 searchTerm, category, autore, 
                 searchDTO.getAnnoPubblicazioneMin(), 
-                searchDTO.getAnnoPubblicazioneMax());
+                searchDTO.getAnnoPubblicazioneMax(),
+                searchDTO.getRatingMin());
             
             // Carica manualmente le immagini per tutti i prodotti
             loadImagesForProducts(products);
@@ -191,7 +192,7 @@ public class ProductSearchController {
             
             List<Product> products;
             if (q != null && !q.trim().isEmpty()) {
-                products = productRepository.findProductsWithFilters(q, null, "", null, null);
+                products = productRepository.findProductsWithFilters(q, null, "", null, null, null);
             } else {
                 products = productRepository.findAll();
             }

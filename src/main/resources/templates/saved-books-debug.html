@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Miei Libri - SiwBooks</title>
+</head>
+<body>
+    <h1>I Miei Libri (Debug Version)</h1>
+    
+    <p>Utente: <span th:text="${user != null ? user.username : 'null'}">Username</span></p>
+    <p>Ruolo: <span th:text="${user != null ? user.role : 'null'}">Role</span></p>
+    <p>Totale libri salvati: <span th:text="${totalSavedBooks ?: 0}">0</span></p>
+    
+    <div th:if="${savedProducts == null}">
+        <p>savedProducts è null</p>
+    </div>
+    
+    <div th:if="${savedProducts != null}">
+        <p>savedProducts non è null. Dimensione: <span th:text="${savedProducts.size()}">0</span></p>
+        
+        <div th:if="${#lists.isEmpty(savedProducts)}">
+            <h3>Nessun libro salvato</h3>
+        </div>
+        
+        <div th:if="${not #lists.isEmpty(savedProducts)}">
+            <h3>Libri salvati:</h3>
+            <ul>
+                <li th:each="product : ${savedProducts}">
+                    <span th:text="${product.name}">Nome libro</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <a href="/products">Vai ai prodotti</a>
+</body>
+</html>

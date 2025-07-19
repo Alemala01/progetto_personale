@@ -6,20 +6,10 @@
     <!-- Common Head -->
     <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
     
-    <!-- Page specific CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <!-- Login specific CSS -->
     <link rel="stylesheet" th:href="@{/css/login.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
 </head>
 <body>
-    <div class="animated-bg">
-        <div class="floating-shapes">
-            <div class="shape"></div>
-            <div class="shape"></div>
-            <div class="shape"></div>
-        </div>
-    </div>
-    
     <!-- Navbar -->
     <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
     
@@ -85,7 +75,7 @@
         </div>
     </main>
     
-    <div th:insert="~{fragments/footer :: footer}"></div>
+    <div th:insert="~{fragments/footer-minimal :: footer-minimal}"></div>
     
     <style>
         .success-message {

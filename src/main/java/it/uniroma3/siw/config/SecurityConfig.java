@@ -25,13 +25,13 @@ public class SecurityConfig {
                                         "/users/register", "/users/login", "/login", "/css/**", "/js/**", 
                                         "/immagini/**", "/images/**").permitAll()
                         
-                        // Solo utenti autenticati: possono lasciare recensioni e salvare libri
-                        .requestMatchers("/review/**", "/users/profile", "/users/products", "/saved-books/**").authenticated()
-                        
                         // Solo admin: possono aggiungere libri e autori
                         .requestMatchers("/product/create/**", "/product/edit/**", "/product/delete/**",
                                         "/author/create/**", "/author/edit/**", "/author/delete/**",
                                         "/admin/**").hasRole("ADMIN")
+                        
+                        // Utenti autenticati e admin: possono lasciare recensioni e salvare libri
+                        .requestMatchers("/review/**", "/users/profile", "/users/products", "/saved-books/**").hasAnyRole("USER", "ADMIN")
                         
                         .anyRequest().permitAll()
                 )

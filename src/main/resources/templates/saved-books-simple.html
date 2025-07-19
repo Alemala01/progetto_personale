@@ -3,22 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>I Miei Libri - SiwBooks</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="stylesheet" th:href="@{/css/minimal-navbar-monochrome.css}">
-    <link rel="stylesheet" th:href="@{/css/footer-minimal.css}">
     <link rel="stylesheet" th:href="@{/css/saved-books.css}">
-    <style>
-        body {
-            background: #f8f9fa !important;
-        }
-    </style>
 </head>
 <body>
     <nav th:replace="fragments/navbar-minimal :: navbar"></nav>
@@ -70,20 +60,37 @@
                             <h3 class="book-title" th:text="${product.name}">Titolo del libro</h3>
                             
                             <div class="book-meta">
+                                <!-- Author -->
+                                <div class="book-meta-item" th:if="${product.authors != null and not #lists.isEmpty(product.authors)}">
+                                    <i class="fas fa-user"></i>
+                                    <span th:text="|${product.authors[0].name} ${product.authors[0].surname}|">Autore</span>
+                                </div>
+                                
                                 <!-- Category -->
                                 <div class="book-meta-item" th:if="${product.category != null}">
                                     <i class="fas fa-tag"></i>
                                     <span th:text="${product.category.name}">Categoria</span>
                                 </div>
                                 
-                                <!-- Year - con nome corretto -->
-                                <div class="book-meta-item" th:if="${product.annoPubblicazione != null}">
+                                <!-- Year -->
+                                <div class="book-meta-item" th:if="${product.pubblicationYear != null}">
                                     <i class="fas fa-calendar"></i>
-                                    <span th:text="${product.annoPubblicazione}">Anno</span>
+                                    <span th:text="${product.pubblicationYear}">Anno</span>
                                 </div>
                             </div>
                             
-                            <!-- Description -->
+                            <!-- Ratings (optional) -->
+                            <div class="book-ratings" th:if="${product.averageRating != null and product.averageRating > 0}">
+                                <div class="rating-stars">
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-text" th:text="|${product.averageRating} (${product.totalRatings ?: 0} recensioni)|">Rating</span>
+                            </div>
+                            
                             <p class="book-description" th:text="${product.description}">Descrizione del libro...</p>
                             
                             <div class="book-actions">
@@ -103,7 +110,7 @@
         </div>
     </main>
     
-    <footer th:replace="fragments/footer-minimal :: footer-minimal"></footer>
+    <footer th:replace="fragments/footer-minimal :: footer"></footer>
     
     <script th:src="@{/js/saved-books.js}"></script>
 </body>

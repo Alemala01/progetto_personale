@@ -3,25 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>I Miei Libri - SiwBooks</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="stylesheet" th:href="@{/css/minimal-navbar-monochrome.css}">
-    <link rel="stylesheet" th:href="@{/css/footer-minimal.css}">
     <link rel="stylesheet" th:href="@{/css/saved-books.css}">
-    <style>
-        body {
-            background: #f8f9fa !important;
-        }
-    </style>
 </head>
 <body>
-    <nav th:replace="fragments/navbar-minimal :: navbar"></nav>
+    <th:block th:replace="fragments/navbar-minimal :: navbar"></th:block>
     
     <main class="main-content">
         <div class="container">
@@ -34,15 +24,14 @@
                 <div class="stat-item">
                     <i class="fas fa-bookmark"></i>
                     <div class="stat-info">
-                        <span class="stat-number" th:text="${totalSavedBooks ?: 0}">0</span>
+                        <span class="stat-number" th:text="${totalSavedBooks}">0</span>
                         <span class="stat-label">Libri salvati</span>
                     </div>
                 </div>
             </div>
             
             <div class="books-section">
-                <!-- Empty state -->
-                <div th:if="${savedProducts == null or #lists.isEmpty(savedProducts)}" class="empty-state">
+                <div th:if="${savedProducts == null || savedProducts.isEmpty()}" class="empty-state">
                     <div class="empty-icon">
                         <i class="fas fa-bookmark"></i>
                     </div>
@@ -54,14 +43,13 @@
                     </a>
                 </div>
                 
-                <!-- Books grid -->
-                <div th:if="${savedProducts != null and not #lists.isEmpty(savedProducts)}" class="books-grid">
+                <div th:if="${savedProducts != null && !savedProducts.isEmpty()}" class="books-grid">
                     <div class="book-card" th:each="product : ${savedProducts}">
                         <div class="book-image">
-                            <div th:if="${product.images != null and not #lists.isEmpty(product.images)}">
+                            <div th:if="${product.images != null && !product.images.isEmpty()}">
                                 <img th:src="@{'/product/image/' + ${product.images[0].id}}" th:alt="${product.name}" />
                             </div>
-                            <div th:unless="${product.images != null and not #lists.isEmpty(product.images)}" class="book-image-placeholder">
+                            <div th:unless="${product.images != null && !product.images.isEmpty()}" class="book-image-placeholder">
                                 <i class="fas fa-book"></i>
                             </div>
                         </div>
@@ -70,20 +58,33 @@
                             <h3 class="book-title" th:text="${product.name}">Titolo del libro</h3>
                             
                             <div class="book-meta">
-                                <!-- Category -->
+                                <div class="book-meta-item" th:if="${product.authors != null && !product.authors.isEmpty()}">
+                                    <i class="fas fa-user"></i>
+                                    <span th:text="|${product.authors[0].name} ${product.authors[0].surname}|">Autore</span>
+                                </div>
+                                
                                 <div class="book-meta-item" th:if="${product.category != null}">
                                     <i class="fas fa-tag"></i>
                                     <span th:text="${product.category.name}">Categoria</span>
                                 </div>
                                 
-                                <!-- Year - con nome corretto -->
-                                <div class="book-meta-item" th:if="${product.annoPubblicazione != null}">
+                                <div class="book-meta-item" th:if="${product.pubblicationYear != null}">
                                     <i class="fas fa-calendar"></i>
-                                    <span th:text="${product.annoPubblicazione}">Anno</span>
+                                    <span th:text="${product.pubblicationYear}">Anno</span>
                                 </div>
                             </div>
                             
-                            <!-- Description -->
+                            <div class="book-ratings" th:if="${product.averageRating != null and product.averageRating > 0}">
+                                <div class="rating-stars">
+                                    <i class="fas fa-star" th:classappend="${product.averageRating >= 1} ? 'filled' : ''"></i>
+                                    <i class="fas fa-star" th:classappend="${product.averageRating >= 2} ? 'filled' : ''"></i>
+                                    <i class="fas fa-star" th:classappend="${product.averageRating >= 3} ? 'filled' : ''"></i>
+                                    <i class="fas fa-star" th:classappend="${product.averageRating >= 4} ? 'filled' : ''"></i>
+                                    <i class="fas fa-star" th:classappend="${product.averageRating >= 5} ? 'filled' : ''"></i>
+                                </div>
+                                <span class="rating-text" th:text="|${#numbers.formatDecimal(product.averageRating, 1, 1)} (${product.totalRatings ?: 0} recensioni)|">4.5 (10 recensioni)</span>
+                            </div>
+                            
                             <p class="book-description" th:text="${product.description}">Descrizione del libro...</p>
                             
                             <div class="book-actions">
@@ -103,7 +104,7 @@
         </div>
     </main>
     
-    <footer th:replace="fragments/footer-minimal :: footer-minimal"></footer>
+    <th:block th:replace="fragments/footer-minimal :: footer"></th:block>
     
     <script th:src="@{/js/saved-books.js}"></script>
 </body>

@@ -7,9 +7,7 @@
     <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
     
     <!-- Page specific CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/register.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
 </head>
 <body>
     <!-- Navbar -->
@@ -107,7 +105,7 @@
     </main>
     
     <!-- Include footer fragment -->
-    <div th:insert="~{fragments/footer :: footer}"></div>
+    <div th:insert="~{fragments/footer-minimal :: footer-minimal}"></div>
     
     <script th:src="@{/js/register.js}"></script>
 </body>
