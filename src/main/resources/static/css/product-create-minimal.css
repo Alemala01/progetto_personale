@@ -827,6 +827,17 @@ body {
     box-shadow: 0 8px 24px var(--shadow-colored-sage);
 }
 
+.btn-success {
+    background: var(--gradient-primary);
+    color: var(--primary-white);
+    border: 1px solid var(--accent-gold);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow-colored-gold);
+}
+
 .btn-outline {
     background: var(--primary-white);
     color: var(--text-dark);

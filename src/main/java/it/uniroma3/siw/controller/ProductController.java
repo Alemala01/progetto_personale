@@ -371,7 +371,7 @@ public class ProductController {
             session.removeAttribute("editingProductId");
             
             logger.debug("Product images updated successfully for ID: {}", productId);
-            return "redirect:/product/" + productId;
+            return "redirect:/product/details/" + productId;
         } catch (IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -388,25 +388,19 @@ public class ProductController {
     }
 
     // Endpoint per salvare le modifiche ai dettagli
-    @PostMapping("/edit/details")
-    public String handleEditDetails(@Valid @ModelAttribute ProductFormDTO productFormDTO,
-                                    BindingResult result, HttpSession session, Model model,
+    @PostMapping("/edit/details/{id}")
+    public String handleEditDetails(@PathVariable Long id, @Valid @ModelAttribute ProductFormDTO productFormDTO,
+                                    BindingResult result, Model model,
                                     RedirectAttributes redirectAttributes) {
         try {
             addAuthenticationAttributes(model);
-            Long productId = (Long) session.getAttribute("editingProductId");
-            if (productId == null) {
-                model.addAttribute("errorMessage", "Sessione scaduta. Riprova.");
-                return "error";
-            }
-
             Users authenticatedUser = getAuthenticatedUser();
             if (authenticatedUser == null) {
                 model.addAttribute("errorMessage", "Devi essere autenticato per modificare un prodotto.");
                 return "error";
             }
             
-            Optional<Product> productOpt = productRepository.findByIdWithSeller(productId);
+            Optional<Product> productOpt = productRepository.findByIdWithSeller(id);
             if (productOpt.isEmpty()) {
                 model.addAttribute("errorMessage", "Prodotto non trovato.");
                 return "error";
@@ -416,7 +410,7 @@ public class ProductController {
             
             // Verifica che l'autore del prodotto non sia null
             if (product.getSeller() == null) {
-                logger.error("Product with ID {} has null author", productId);
+                logger.error("Product with ID {} has null author", id);
                 model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
                 return "error";
             }
@@ -439,13 +433,12 @@ public class ProductController {
             
             // Aggiorna i dettagli del prodotto
             productService.updateProductDetails(product, productFormDTO);
-            session.removeAttribute("editingProductId");
             
             // Aggiungi messaggio di successo
             redirectAttributes.addFlashAttribute("successMessage", "Prodotto aggiornato con successo!");
             
-            logger.info("Product details updated successfully for ID: {} by user: {}", productId, authenticatedUser.getUsername());
-            return "redirect:/product/details/" + productId;
+            logger.info("Product details updated successfully for ID: {} by user: {}", id, authenticatedUser.getUsername());
+            return "redirect:/product/details/" + id;
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));

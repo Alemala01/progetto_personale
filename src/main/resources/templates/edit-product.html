@@ -2,62 +2,79 @@
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Modifica Prodotto</title>
-    
+    <title>Modifica Prodotto - Libreria Sitarello</title>
     <!-- Common Head -->
     <th:block th:replace="~{fragments/common-head :: common-head}"></th:block>
-    
-    <!-- Page specific CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/footer.css}" />
-    <link rel="stylesheet" th:href="@{/css/edit-product.css}" />
+    <!-- Minimal & Elegant CSS -->
+    <link rel="stylesheet" th:href="@{/css/minimal-homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/product-create-minimal.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer-minimal.css}" />
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="animated-bg"></div>
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
+    <!-- Navbar -->
     
     <!-- Navbar -->
     <div th:insert="~{fragments/navbar-minimal :: navbar}"></div>
-    <main class="container">
-        <h1>Modifica Prodotto</h1>
-        <div class="product-details">
-            <h2 th:text="${product.name}">Nome Prodotto</h2>
-            <p><strong>Categoria:</strong> <span th:text="${product.category?.name ?: 'Categoria non specificata'}"></span></p>
-            <p><strong>Descrizione:</strong> <span th:text="${product.description}"></span></p>
-            
-            <div class="image-info">
-                <h4>Immagini del prodotto:</h4>
-                <p>Le immagini possono essere modificate nella sezione "Modifica Immagini".</p>
+    <main class="product-create-container container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1 class="page-title">
+                    <i class="fas fa-edit"></i>
+                    Modifica Prodotto
+                </h1>
+                <p class="page-subtitle">Aggiorna i dettagli del libro o gestisci le immagini</p>
             </div>
         </div>
-        
-        <div class="edit-options">
-            <h3>Cosa vuoi modificare?</h3>
-            <div class="button-group">
-                <a th:href="@{'/product/edit/' + ${product.id} + '/details'}" class="button">Modifica Dettagli</a>
-                <a th:href="@{'/product/edit/' + ${product.id} + '/images'}" class="button">Modifica Immagini</a>
+        <div class="card product-card">
+            <div class="card-header">
+                <h2 class="product-name" th:text="${product.name}">Nome Prodotto</h2>
             </div>
-            
-            <div class="danger-zone">
-                <h3>Zona Pericolosa</h3>
+            <div class="card-body">
+                <div class="product-meta">
+                    <span class="product-category"><i class="fas fa-tag"></i> <span th:text="${product.category?.name ?: 'Categoria non specificata'}"></span></span>
+                </div>
+                <hr>
+                <p class="product-description" th:text="${product.description}"></p>
+                <div class="image-info mt-3">
+                    <h4><i class="fas fa-images"></i> Immagini del prodotto</h4>
+                    <p>Le immagini possono essere modificate nella sezione <b>Modifica Immagini</b>.</p>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="section-title"><i class="fas fa-tools"></i> Cosa vuoi modificare?</h3>
+            </div>
+            <div class="card-body button-group">
+                <a th:href="@{'/product/edit/' + ${product.id} + '/details'}" class="btn btn-primary mr-2">
+                    <i class="fas fa-edit"></i> Modifica Dettagli
+                </a>
+                <a th:href="@{'/product/edit/' + ${product.id} + '/images'}" class="btn btn-secondary">
+                    <i class="fas fa-images"></i> Modifica Immagini
+                </a>
+            </div>
+        </div>
+        <div class="card mt-4 danger-zone">
+            <div class="card-header danger-title">
+                <h3><i class="fas fa-exclamation-triangle"></i> Zona Pericolosa</h3>
+            </div>
+            <div class="card-body">
                 <form th:action="@{'/product/delete/' + ${product.id}}" method="post" 
                       onsubmit="return confirm('Sei sicuro di voler eliminare questo prodotto? Questa azione non può essere annullata.');">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                    <button type="submit" class="button danger">Elimina Prodotto</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Elimina Prodotto
+                    </button>
                 </form>
             </div>
         </div>
-        
-        <div class="navigation-buttons">
-            <a th:href="@{/users/products}" class="button secondary">Torna ai Miei Prodotti</a>
+        <div class="navigation-buttons mt-4">
+            <a th:href="@{/users/products}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Torna ai Miei Prodotti
+            </a>
         </div>
     </main>
-    <!-- Include footer fragment -->    <div th:insert="~{fragments/footer :: footer}"></div>
+    <div th:insert="~{fragments/footer-minimal :: footer-minimal}"></div>
 </body>
 </html>
 
