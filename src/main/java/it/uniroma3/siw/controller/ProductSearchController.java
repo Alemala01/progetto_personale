@@ -1,6 +1,7 @@
 package it.uniroma3.siw.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,19 +62,27 @@ public class ProductSearchController {
      * Visualizza tutti i prodotti con possibilità di ricerca e filtri
      */
     @GetMapping
-    public String showAllProducts(Model model) {
+    public String showAllProducts(@RequestParam(required = false) String categoryName, Model model) {
         try {
             addAuthenticationAttributes(model);
             
-            // Carica tutti i prodotti senza filtri - con gestione errori
+            // Carica tutti i prodotti - se c'è una categoria, applica il filtro
             List<Product> products;
             try {
-                products = productRepository.findAll();
+                if (categoryName != null && !categoryName.isEmpty()) {
+                    Optional<Category> categoryOpt = categoryRepository.findByName(categoryName);
+                    if (categoryOpt.isPresent()) {
+                        products = productRepository.findByCategory(categoryOpt.get());
+                    } else {
+                        products = productRepository.findAll();
+                    }
+                } else {
+                    products = productRepository.findAll();
+                }
+                
                 if (products == null) {
                     products = List.of(); // Lista vuota invece di null
                 }
-                // Carica manualmente le immagini per tutti i prodotti
-                // loadImagesForProducts(products); // Temporaneamente disabilitato per debug
             } catch (Exception e) {
                 logger.warn("Errore nel caricamento dei prodotti: {}", e.getMessage());
                 products = List.of(); // Lista vuota in caso di errore
@@ -92,7 +101,13 @@ public class ProductSearchController {
             
             model.addAttribute("products", products);
             model.addAttribute("categories", categories);
-            model.addAttribute("searchDTO", new ProductSearchDTO());
+            
+            // Pre-fill the search form if a category was selected
+            ProductSearchDTO searchDTO = new ProductSearchDTO();
+            if (categoryName != null && !categoryName.isEmpty()) {
+                searchDTO.setCategoria(categoryName);
+            }
+            model.addAttribute("searchDTO", searchDTO);
             model.addAttribute("totalProducts", products.size());
             
             logger.info("Loaded {} products for public view", products.size());

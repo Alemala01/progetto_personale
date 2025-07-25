@@ -217,7 +217,7 @@
             </div>
             <div class="categories-grid">
                 <a th:each="category : ${categories}" 
-                   th:href="@{/products(category=${category.id})}" 
+                   th:href="@{/products(categoryName=${category.name})}" 
                    class="category-card">
                     <div class="category-icon">
                         <i class="fas fa-bookmark"></i>
